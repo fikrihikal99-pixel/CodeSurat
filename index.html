@@ -3,11 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Generator Nomor Surat — SD (dengan History)</title>
+  <title>Generator Nomor Surat — SD (Online History)</title>
   <style>
-    :root{
-      --bg:#f7fafc; --card:#ffffff; --accent:#2563eb; --muted:#6b7280; --radius:10px;
-    }
+    :root{ --bg:#f7fafc; --card:#ffffff; --accent:#2563eb; --muted:#6b7280; --radius:10px; }
     body{ margin:0; font-family:Inter, "Segoe UI", Roboto, Arial; background:var(--bg); color:#0f172a; padding:20px; }
     .container{ max-width:1040px; margin:0 auto; }
     .card{ background:var(--card); border-radius:12px; padding:18px; box-shadow:0 6px 20px rgba(15,23,42,0.06); margin-bottom:16px; }
@@ -16,9 +14,7 @@
     label{ display:block; font-weight:600; margin-top:10px; font-size:13px; }
     .flex{ display:flex; gap:12px; align-items:center; }
     .row{ display:flex; gap:12px; margin-top:8px; flex-wrap:wrap; }
-    input[type="text"], input[type="number"], select, textarea{
-      width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6e9ef; font-size:14px; box-sizing:border-box; background:white;
-    }
+    input[type="text"], input[type="number"], select, textarea{ width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6e9ef; font-size:14px; box-sizing:border-box; background:white; }
     .small{ font-size:13px; color:var(--muted); }
     .btn{ border:0; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
     .btn-primary{ background:var(--accent); color:white; }
@@ -47,8 +43,8 @@
 <body>
   <div class="container">
     <div class="card">
-      <h1>Generator Nomor Surat — Sekolah Dasar NEGERI CILUAR 1</h1>
-      <p class="lead">Format: <code>KODE/NOMOR/NAMA SEKOLAH/BULAN_ROMAWI/TAHUN</code>. Riwayat tersimpan permanen di browser.</p>
+      <h1>Generator Nomor Surat — SDN CILUAR 1 (Online History)</h1>
+      <p class="lead">Format: <code>KODE/NOMOR/NAMA SEKOLAH/BULAN_ROMAWI/TAHUN</code>. Riwayat tersimpan online ke Google Sheet.</p>
 
       <!-- Search + Kode list -->
       <label for="searchKode">Cari Kode Surat (ketik kata kunci atau kode)</label>
@@ -65,9 +61,7 @@
 
         <div style="width:340px;">
           <label>Keterangan Kode</label>
-          <div id="kodeDesc" style="padding:10px;border-radius:8px;background:#fbfdff;border:1px solid #eef2ff;min-height:68px;">
-            Pilih kode untuk melihat keterangan.
-          </div>
+          <div id="kodeDesc" style="padding:10px;border-radius:8px;background:#fbfdff;border:1px solid #eef2ff;min-height:68px;">Pilih kode untuk melihat keterangan.</div>
         </div>
       </div>
 
@@ -146,18 +140,22 @@
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div>
           <h2 style="margin:0;font-size:16px;">Riwayat Nomor Surat</h2>
-          <div class="small">Semua riwayat disimpan di browser (localStorage)</div>
+          <div class="small">Riwayat online tersimpan di Google Sheet. Juga disimpan lokal sebagai cache.</div>
         </div>
         <div style="display:flex; gap:8px;">
-          <button id="clearHistoryBtn" class="btn danger">🗑️ Hapus Riwayat</button>
+          <button id="loadOnlineBtn" class="btn btn-primary">🔄 Muat Riwayat Online</button>
+          <button id="copyAllHistoryBtn" class="btn btn-ghost">📋 Salin Semua</button>
+          <button id="clearHistoryBtn" class="btn danger">🗑️ Hapus Riwayat Lokal</button>
         </div>
       </div>
 
-      <div id="historyContainer" class="history-list" style="margin-top:12px;">
-        <!-- history items injected here -->
-      </div>
-
+      <div id="historyContainer" class="history-list" style="margin-top:12px;"></div>
       <div id="noHistoryMsg" class="small" style="margin-top:8px; color:var(--muted); display:none;">Belum ada riwayat.</div>
+
+      <div style="margin-top:12px;">
+        <label>Nama Pembuat (opsional)</label>
+        <input id="pembuatInput" type="text" placeholder="Nama Anda, mis. Kepala Sekolah / Admin" />
+      </div>
     </div>
   </div>
 
@@ -225,7 +223,6 @@
 
     function padTwo(n){ return String(n).padStart(2,'0'); }
     function formatIndoDate(isoString){
-      // returns e.g. "Senin, 6 Oktober 2025"
       const d = new Date(isoString);
       const opt = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
       return d.toLocaleDateString('id-ID', opt);
@@ -258,6 +255,12 @@
     const historyContainer = $('historyContainer');
     const clearHistoryBtn = $('clearHistoryBtn');
     const noHistoryMsg = $('noHistoryMsg');
+    const loadOnlineBtn = $('loadOnlineBtn');
+    const copyAllHistoryBtn = $('copyAllHistoryBtn');
+    const pembuatInput = $('pembuatInput');
+
+    // API URL (Apps Script) - GANTI jika perlu
+    const API_URL = "https://script.google.com/macros/s/AKfycbzz01wrrVoMVA-kA6VPKES2EqpdnOHKBBha8Y0PlrTwI53aNHmdolORd-R7nm5nYU2i/exec";
 
     // render kode list
     let kodeElements = [];
@@ -355,132 +358,72 @@
     sekolahCustom.addEventListener('input', ()=> { if(sekolahSelect.value==='LAINNYA') loadLastNumberForCurrentCombo(); });
 
     // =========================
-    // History (localStorage)
+    // History (localStorage + online)
     // =========================
     const HISTORY_KEY = 'surat.history.v1';
 
     function loadHistory(){
-      try{
-        const raw = localStorage.getItem(HISTORY_KEY);
-        return raw ? JSON.parse(raw) : [];
-      }catch(e){ return []; }
+      try{ const raw = localStorage.getItem(HISTORY_KEY); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
     }
-    function saveHistory(arr){
-      try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }catch(e){}
-    }
+    function saveHistory(arr){ try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }catch(e){} }
     function addHistoryEntry(text){
       const nowIso = new Date().toISOString();
       const id = nowIso + '::' + Math.random().toString(36).slice(2,9);
       const entry = { id, text, created: nowIso };
       const arr = loadHistory();
-      arr.unshift(entry); // newest first
-      // limit history length to e.g. 200 entries to avoid huge storage
+      arr.unshift(entry);
       if(arr.length > 200) arr.length = 200;
       saveHistory(arr);
       renderHistory();
     }
-    function deleteHistoryEntry(id){
-      let arr = loadHistory();
-      arr = arr.filter(e=> e.id !== id);
-      saveHistory(arr);
-      renderHistory();
-    }
-    function clearHistory(){
-      if(!confirm('Hapus semua riwayat? Tindakan ini tidak bisa dibatalkan.')) return;
-      localStorage.removeItem(HISTORY_KEY);
-      renderHistory();
-    }
+    function deleteHistoryEntry(id){ let arr = loadHistory(); arr = arr.filter(e=> e.id !== id); saveHistory(arr); renderHistory(); }
+    function clearHistory(){ if(!confirm('Hapus semua riwayat lokal? Tindakan ini tidak bisa dibatalkan.')) return; localStorage.removeItem(HISTORY_KEY); renderHistory(); }
 
     // render history
     function renderHistory(){
       const arr = loadHistory();
       historyContainer.innerHTML = '';
-      if(!arr || arr.length === 0){
-        noHistoryMsg.style.display = 'block';
-        return;
-      } else noHistoryMsg.style.display = 'none';
+      if(!arr || arr.length === 0){ noHistoryMsg.style.display = 'block'; return; } else noHistoryMsg.style.display = 'none';
       arr.forEach(entry => {
-        const div = document.createElement('div');
-        div.className = 'history-item';
+        const div = document.createElement('div'); div.className = 'history-item';
         const left = document.createElement('div'); left.className = 'hist-left';
         const right = document.createElement('div'); right.className = 'hist-right';
 
-        const dt = document.createElement('div');
-        dt.innerHTML = `<strong>${formatIndoDate(entry.created)}</strong>`;
-        const txt = document.createElement('div');
-        txt.className = 'tiny';
-        txt.textContent = entry.text;
+        const dt = document.createElement('div'); dt.innerHTML = `<strong>${formatIndoDate(entry.created)}</strong>`;
+        const txt = document.createElement('div'); txt.className = 'tiny'; txt.textContent = entry.text;
 
-        left.appendChild(dt);
-        left.appendChild(txt);
+        left.appendChild(dt); left.appendChild(txt);
 
         // copy btn
-        const copyB = document.createElement('button');
-        copyB.className = 'btn btn-ghost';
-        copyB.textContent = 'Copy';
-        copyB.addEventListener('click', async ()=>{
-          try{ await navigator.clipboard.writeText(entry.text); copyB.textContent = '✅'; setTimeout(()=> copyB.textContent='Copy',900); }
-          catch{ alert('Gagal menyalin.'); }
-        });
+        const copyB = document.createElement('button'); copyB.className = 'btn btn-ghost'; copyB.textContent = 'Copy';
+        copyB.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(entry.text); copyB.textContent = '✅'; setTimeout(()=> copyB.textContent='Copy',900); } catch{ alert('Gagal menyalin.'); } });
 
         // delete btn
-        const delB = document.createElement('button');
-        delB.className = 'btn btn-muted';
-        delB.textContent = 'Hapus';
-        delB.addEventListener('click', ()=> {
-          if(confirm('Hapus entri ini dari riwayat?')) deleteHistoryEntry(entry.id);
-        });
+        const delB = document.createElement('button'); delB.className = 'btn btn-muted'; delB.textContent = 'Hapus';
+        delB.addEventListener('click', ()=> { if(confirm('Hapus entri ini dari riwayat?')) deleteHistoryEntry(entry.id); });
 
-        // re-use/generate again btn (isi fields with this entry)
-        const reuseB = document.createElement('button');
-        reuseB.className = 'btn btn-primary';
-        reuseB.textContent = 'Gunakan';
+        // reuse btn
+        const reuseB = document.createElement('button'); reuseB.className = 'btn btn-primary'; reuseB.textContent = 'Gunakan';
         reuseB.addEventListener('click', ()=>{
-          // entry.text format: KODE/NOMOR/SEKOLAH/BULAN/Tahun
           const parts = entry.text.split('/');
           if(parts.length >= 5){
-            const kode = parts[0];
-            const nomor = parts[1];
-            const sekolah = parts[2];
-            const bulan = parts[3];
-            const tahun = parts[4];
-            // select kode (if exists)
+            const kode = parts[0]; const nomor = parts[1]; const sekolah = parts[2]; const bulan = parts[3]; const tahun = parts[4];
             const found = kodeData.find(k=>k.kode === kode);
-            if(found) {
-              // re-render list to include kode if filtered
-              renderKodeList(kodeData);
-              selectKode(kode);
-            } else {
-              alert('Kode pada riwayat tidak ditemukan di daftar kode. Pilih manual.');
-            }
+            if(found) { renderKodeList(kodeData); selectKode(kode); } else { alert('Kode pada riwayat tidak ditemukan di daftar kode. Pilih manual.'); }
             nomorInput.value = Number(nomor) || 1;
-            // sekolah: if in select, choose it, else set manual
             const opt = Array.from(sekolahSelect.options).find(o=> o.value === sekolah);
-            if(opt) { sekolahSelect.value = sekolah; sekolahCustom.style.display='none'; sekolahCustom.value=''; }
-            else { sekolahSelect.value = 'LAINNYA'; sekolahCustom.style.display='block'; sekolahCustom.value = sekolah; }
-            // bulan
+            if(opt) { sekolahSelect.value = sekolah; sekolahCustom.style.display='none'; sekolahCustom.value=''; } else { sekolahSelect.value = 'LAINNYA'; sekolahCustom.style.display='block'; sekolahCustom.value = sekolah; }
             const bIndex = Array.from(bulanSelect.options).findIndex(o=> o.value === bulan);
             if(bIndex >= 0) bulanSelect.selectedIndex = bIndex;
             tahunInput.value = tahun || defaultYear;
-            // update preview but don't auto-save to history
             const full = entry.text;
-            hasilEl.value = full;
-            previewNumber.textContent = full;
-            previewNumberInline.textContent = full;
-            previewKet.textContent = (found ? found.ket : '-');
-            previewMeta.textContent = `${sekolah} — Kode ${kode} (${found ? found.ket : '—'}) — dimuat dari riwayat`;
-            previewCreated.textContent = formatIndoDate(entry.created);
-            previewArea.style.display = 'block';
+            hasilEl.value = full; previewNumber.textContent = full; previewNumberInline.textContent = full; previewKet.textContent = (found ? found.ket : '-'); previewMeta.textContent = `${sekolah} — Kode ${kode} (${found ? found.ket : '—'}) — dimuat dari riwayat`; previewCreated.textContent = formatIndoDate(entry.created); previewArea.style.display = 'block';
           } else alert('Format riwayat tidak dikenali.');
         });
 
-        right.appendChild(reuseB);
-        right.appendChild(copyB);
-        right.appendChild(delB);
+        right.appendChild(reuseB); right.appendChild(copyB); right.appendChild(delB);
 
-        div.appendChild(left);
-        div.appendChild(right);
-        historyContainer.appendChild(div);
+        div.appendChild(left); div.appendChild(right); historyContainer.appendChild(div);
       });
     }
 
@@ -488,40 +431,73 @@
     clearHistoryBtn.addEventListener('click', clearHistory);
 
     // =========================
+    // Online save/load functions
+    // =========================
+    async function saveOnlineHistory(data){
+      try{
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' } });
+        console.log('✅ Data tersimpan online');
+      } catch(err){ console.error('Gagal kirim data ke Google Sheet:', err); }
+    }
+
+    async function loadOnlineHistory(){
+      try{
+        const res = await fetch(API_URL);
+        const json = await res.json();
+        // Apps Script returns rows with header names as keys (Tanggal, Sekolah, ...)
+        // convert to array of "Hasil" values in reverse (newest first)
+        if(!Array.isArray(json)) return [];
+        const mapped = json.map(r => ({ created: r.Tanggal || r.Date || new Date().toISOString(), text: r.Hasil || r.hasil || Object.values(r).slice(6,7)[0] || '' }));
+        // newest first
+        return mapped.reverse();
+      } catch(err){ console.error('Gagal muat riwayat online:', err); return []; }
+    }
+
+    loadOnlineBtn.addEventListener('click', async ()=>{
+      loadOnlineBtn.textContent = 'Memuat...';
+      const arr = await loadOnlineHistory();
+      if(!arr || arr.length === 0){ alert('Tidak ada riwayat online atau gagal memuat.'); loadOnlineBtn.textContent = '🔄 Muat Riwayat Online'; return; }
+      // show top 50
+      const top = arr.slice(0,50);
+      // merge into local storage (prepend) but avoid duplicates by text
+      const local = loadHistory();
+      const existingTexts = new Set(local.map(x=>x.text));
+      top.forEach(a => { if(!existingTexts.has(a.text)){ local.unshift({ id: a.created + '::online', text: a.text, created: a.created }); existingTexts.add(a.text); } });
+      if(local.length > 200) local.length = 200;
+      saveHistory(local);
+      renderHistory();
+      loadOnlineBtn.textContent = '🔄 Muat Riwayat Online';
+      alert('Riwayat online dimuat ke cache lokal.');
+    });
+
+    // copy all history
+    copyAllHistoryBtn.addEventListener('click', async ()=>{
+      const arr = loadHistory();
+      if(!arr.length) return alert('Belum ada riwayat.');
+      const text = arr.map(e => e.text).join('\n');
+      try{ await navigator.clipboard.writeText(text); copyAllHistoryBtn.textContent = '✅ Disalin Semua'; setTimeout(()=> copyAllHistoryBtn.textContent='📋 Salin Semua',1200); }catch{ alert('Gagal menyalin semua riwayat.'); }
+    });
+
+    // =========================
     // Generate & Preview logic
     // =========================
     function getSelectedSchool(){ return (sekolahSelect.value === 'LAINNYA' ? (sekolahCustom.value.trim() || 'SD-TIDAK-TERTENTU') : sekolahSelect.value); }
-    function validateFields(){
-      if(!selectedKode) { alert('Pilih kode surat terlebih dahulu.'); return false; }
-      const nomor = Number(nomorInput.value || 0);
-      if(!Number.isFinite(nomor) || nomor < 1) { alert('Nomor surat tidak valid.'); return false; }
-      const tahun = Number(tahunInput.value || 0);
-      if(!Number.isFinite(tahun) || tahun < 1900) { alert('Tahun tidak valid.'); return false; }
-      return true;
-    }
-    function buildNomorSurat(){
-      const kode = selectedKode;
-      const nomor = padTwo(Number(nomorInput.value || 1));
-      const sekolah = getSelectedSchool();
-      const bulan = bulanSelect.value;
-      const tahun = String(tahunInput.value || defaultYear);
-      return `${kode}/${nomor}/${sekolah}/${bulan}/${tahun}`;
-    }
+    function getSelectedMonth(){ return bulanSelect.value; }
+    function validateFields(){ if(!selectedKode) { alert('Pilih kode surat terlebih dahulu.'); return false; } const nomor = Number(nomorInput.value || 0); if(!Number.isFinite(nomor) || nomor < 1) { alert('Nomor surat tidak valid.'); return false; } const tahun = Number(tahunInput.value || 0); if(!Number.isFinite(tahun) || tahun < 1900) { alert('Tahun tidak valid.'); return false; } return true; }
+    function buildNomorSurat(){ const kode = selectedKode; const nomor = padTwo(Number(nomorInput.value || 1)); const sekolah = getSelectedSchool(); const bulan = getSelectedMonth(); const tahun = String(tahunInput.value || defaultYear); return `${kode}/${nomor}/${sekolah}/${bulan}/${tahun}`; }
     function updatePreviewAndSave(){
       if(!validateFields()) return;
       const full = buildNomorSurat();
-      hasilEl.value = full;
-      previewNumber.textContent = full;
-      previewNumberInline.textContent = full;
-      const found = kodeData.find(k=>k.kode===selectedKode);
-      previewKet.textContent = found ? found.ket : '-';
-      previewMeta.textContent = `${getSelectedSchool()} — Kode ${selectedKode} (${found ? found.ket : '—'}) — dibuat:`;
-      previewCreated.textContent = formatIndoDate(new Date().toISOString());
-      previewArea.style.display = 'block';
+      hasilEl.value = full; previewNumber.textContent = full; previewNumberInline.textContent = full; const found = kodeData.find(k=>k.kode===selectedKode); previewKet.textContent = found ? found.ket : '-'; previewMeta.textContent = `${getSelectedSchool()} — Kode ${selectedKode} (${found ? found.ket : '—'}) — dibuat:`; previewCreated.textContent = formatIndoDate(new Date().toISOString()); previewArea.style.display = 'block';
       // save last nomor for combo
       saveLastNumber(selectedKode, getSelectedSchool(), String(tahunInput.value || defaultYear), Number(nomorInput.value || 1));
-      // add to history
+      // add to local history
       addHistoryEntry(full);
+      // send to online sheet
+      saveOnlineHistory({ sekolah: getSelectedSchool(), kode: selectedKode, nomor: padTwo(Number(nomorInput.value||1)), bulan: getSelectedMonth(), tahun: tahunInput.value, hasil: full, pembuat: (pembuatInput.value || 'Anon') });
+      // increment nomor for convenience
+      nomorInput.value = Number(nomorInput.value) + 1;
+      saveLastNumber(selectedKode, getSelectedSchool(), String(tahunInput.value || defaultYear), Number(nomorInput.value || 1));
     }
 
     // generate button
@@ -531,7 +507,7 @@
     copyBtn.addEventListener('click', async ()=>{
       if(!hasilEl.value.trim()){ alert('Belum ada hasil. Tekan Generate dulu.'); return; }
       try{ await navigator.clipboard.writeText(hasilEl.value.trim()); copyBtn.textContent = '✅ Disalin'; setTimeout(()=> copyBtn.textContent='Copy',1200); }
-      catch{ hasilEl.select(); try { document.execCommand('copy'); copyBtn.textContent='✅ Disalin'; setTimeout(()=> copyBtn.textContent='Copy',1200); } catch { alert('Gagal menyalin ke clipboard.'); } }
+      catch{ hasilEl.select(); try { document.execCommand('copy'); copyBtn.textContent = '✅ Disalin'; setTimeout(()=> copyBtn.textContent='Copy',1200); } catch { alert('Gagal menyalin ke clipboard.'); } }
     });
 
     // reset button (doesn't clear history)
@@ -539,15 +515,11 @@
       selectedKode = null; kodeElements.forEach(k=>k.el.classList.remove('kode-selected'));
       kodeDescEl.textContent = 'Pilih kode untuk melihat keterangan.';
       nomorInput.value = 1; sekolahSelect.selectedIndex = 0; sekolahCustom.value=''; sekolahCustom.style.display='none';
-      bulanSelect.selectedIndex = defaultMonthIndex; tahunInput.value = defaultYear;
-      hasilEl.value = ''; previewArea.style.display = 'none';
+      bulanSelect.selectedIndex = defaultMonthIndex; tahunInput.value = defaultYear; hasilEl.value = ''; previewArea.style.display = 'none';
     });
 
     // initial load
-    window.addEventListener('load', ()=>{
-      if(kodeData.length) selectKode(kodeData[0].kode);
-      renderHistory();
-    });
+    window.addEventListener('load', ()=>{ if(kodeData.length) selectKode(kodeData[0].kode); renderHistory(); searchEl.focus(); });
 
   </script>
 </body>
