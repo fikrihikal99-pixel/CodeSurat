@@ -260,7 +260,7 @@
     const pembuatInput = $('pembuatInput');
 
     // API URL (Apps Script) - GANTI jika perlu
-    const API_URL = "https://script.google.com/macros/s/AKfycbzz01wrrVoMVA-kA6VPKES2EqpdnOHKBBha8Y0PlrTwI53aNHmdolORd-R7nm5nYU2i/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbydUnjKyMUZ9sWCWgWvsZ8kFbFhmzbwEHWNgSpZzcOBzhqrXyD2OfJ4cfV7I3giypdepA/exec";
 
     // render kode list
     let kodeElements = [];
@@ -290,7 +290,7 @@
         else k.el.classList.remove('kode-selected');
       });
       const found = kodeData.find(x=>x.kode===kode);
-      kodeDescEl.textContent = found ? found.ket : 'Tidak ada keterangan.';
+      kodeDescEl.textContent = found ? found.ket : 'Tidak ada keterangan.'; 
       loadLastNumberForCurrentCombo();
       previewArea.style.display = 'none';
     }
@@ -311,8 +311,8 @@
     clearSearchBtn.addEventListener('click', ()=> { searchEl.value=''; searchEl.dispatchEvent(new Event('input')); });
 
     // sekolah custom toggle
-    sekolahSelect.addEventListener('change', ()=>{
-      if(sekolahSelect.value === 'LAINNYA'){ sekolahCustom.style.display = 'block'; sekolahCustom.focus(); }
+    sekolahSelect.addEventListener('change', ()=>{ 
+      if(sekolahSelect.value === 'LAINNYA'){ sekolahCustom.style.display = 'block'; sekolahCustom.focus(); } 
       else { sekolahCustom.style.display = 'none'; sekolahCustom.value = ''; }
       loadLastNumberForCurrentCombo();
     });
@@ -346,7 +346,7 @@
     }
     // save when nomor changes (debounced)
     let saveTimer = null;
-    nomorInput.addEventListener('input', ()=>{
+    nomorInput.addEventListener('input', ()=>{ 
       if(saveTimer) clearTimeout(saveTimer);
       saveTimer = setTimeout(()=>{
         if(!selectedKode) return;
@@ -430,36 +430,51 @@
     // attach clear history
     clearHistoryBtn.addEventListener('click', clearHistory);
 
-    // =========================
-    // Online save/load functions
-    // =========================
-    async function saveOnlineHistory(data){
-      try{
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' } });
-        console.log('✅ Data tersimpan online');
-      } catch(err){ console.error('Gagal kirim data ke Google Sheet:', err); }
-    }
+// =========================
+// Online save/load functions
+// =========================
+async function saveOnlineHistory(data) {
+  try {
+    // Gunakan no-cors agar fetch tidak ditolak oleh browser
+    const resp = await fetch(API_URL, {
+      method: 'POST',
+      mode: 'no-cors', // biar tidak gagal karena CORS
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    // Karena mode no-cors, kita tidak bisa membaca response JSON,
+    // jadi anggap berhasil kalau tidak error di fetch.
+    console.log('✅ Data dikirim ke Google Sheet (mode no-cors)');
+    statusSaved.textContent = '✅ Tersimpan ke Google Sheet';
+    setTimeout(() => (statusSaved.textContent = ''), 1800);
+
+  } catch (err) {
+    console.error('❌ Gagal kirim data ke Google Sheet:', err);
+    alert('Terjadi kesalahan saat mengirim data: ' + err.message);
+  }
+}
+
+
 
     async function loadOnlineHistory(){
       try{
         const res = await fetch(API_URL);
         const json = await res.json();
-        // Apps Script returns rows with header names as keys (Tanggal, Sekolah, ...)
-        // convert to array of "Hasil" values in reverse (newest first)
         if(!Array.isArray(json)) return [];
-        const mapped = json.map(r => ({ created: r.Tanggal || r.Date || new Date().toISOString(), text: r.Hasil || r.hasil || Object.values(r).slice(6,7)[0] || '' }));
-        // newest first
+        const mapped = json.map(r => ({ created: r.Tanggal || r.Date || new Date().toISOString(), text: r.Hasil || r.hasil || (Object.values(r)[6]||'') }));
         return mapped.reverse();
-      } catch(err){ console.error('Gagal muat riwayat online:', err); return []; }
+      } catch(err){
+        console.error('Gagal muat riwayat online:', err);
+        return [];
+      }
     }
 
     loadOnlineBtn.addEventListener('click', async ()=>{
       loadOnlineBtn.textContent = 'Memuat...';
       const arr = await loadOnlineHistory();
       if(!arr || arr.length === 0){ alert('Tidak ada riwayat online atau gagal memuat.'); loadOnlineBtn.textContent = '🔄 Muat Riwayat Online'; return; }
-      // show top 50
       const top = arr.slice(0,50);
-      // merge into local storage (prepend) but avoid duplicates by text
       const local = loadHistory();
       const existingTexts = new Set(local.map(x=>x.text));
       top.forEach(a => { if(!existingTexts.has(a.text)){ local.unshift({ id: a.created + '::online', text: a.text, created: a.created }); existingTexts.add(a.text); } });
