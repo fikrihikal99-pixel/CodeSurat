@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Generator Nomor Surat — SD (Online History)</title>
+  <title>PEMBUATAN NOMOR SURAT — SDN CILUAR 1</title>
   <style>
-    :root{ --bg:#f7fafc; --card:#ffffff; --accent:#2563eb; --muted:#6b7280; --radius:10px; }
+    :root{ --bg:#f7fafc; --card:#ffffff; --accent:#2563eb; --muted:#6b7280; --radius:10px; --danger:#ef4444; }
     body{ margin:0; font-family:Inter, "Segoe UI", Roboto, Arial; background:var(--bg); color:#0f172a; padding:20px; }
     .container{ max-width:1040px; margin:0 auto; }
     .card{ background:var(--card); border-radius:12px; padding:18px; box-shadow:0 6px 20px rgba(15,23,42,0.06); margin-bottom:16px; }
@@ -14,851 +14,569 @@
     label{ display:block; font-weight:600; margin-top:10px; font-size:13px; }
     .flex{ display:flex; gap:12px; align-items:center; }
     .row{ display:flex; gap:12px; margin-top:8px; flex-wrap:wrap; }
-    input[type="text"], input[type="number"], select, textarea{ width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6e9ef; font-size:14px; box-sizing:border-box; background:white; }
-    .small{ font-size:13px; color:var(--muted); }
-    .btn{ border:0; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
+    input, select, textarea{ width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6e9ef; font-size:14px; box-sizing:border-box; background:white; }
+    .btn{ border:0; padding:10px 15px; border-radius:8px; cursor:pointer; font-weight:700; transition:0.2s; }
     .btn-primary{ background:var(--accent); color:white; }
-    .btn-ghost{ background:#eef2ff; color:var(--accent); border:1px solid rgba(37,99,235,0.12); }
-    .btn-muted{ background:#f1f5f9; color:#0f172a; }
+    .btn-ghost{ background:#eef2ff; color:var(--accent); }
+    .btn-danger{ background:#fee2e2; color:var(--danger); font-size: 11px; padding: 5px 10px; }
     .nbtn{ width:38px; height:38px; border-radius:8px; border:0; background:var(--accent); color:white; font-size:18px; cursor:pointer; }
-    .kode-list{ max-height:240px; overflow:auto; margin-top:8px; border:1px solid #eef2ff; border-radius:8px; padding:6px; background:#fff; }
-    .kode-item{ padding:8px; border-radius:6px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; gap:8px; }
-    .kode-item:hover{ background:#f8fafc; }
-    .kode-selected{ background:#eef2ff; border-left:4px solid var(--accent); }
-    .preview{ margin-top:12px; padding:12px; border-radius:8px; background:#0f172a; color:white; font-family:Georgia, 'Times New Roman', serif; }
-    .preview .big{ font-size:16px; font-weight:700; }
-    textarea#hasil{ height:56px; resize:vertical; }
-    .controls{ display:flex; gap:8px; margin-top:10px; align-items:center; flex-wrap:wrap; }
-    .footnote{ margin-top:8px; font-size:12px; color:var(--muted); }
-    .history-list{ margin-top:12px; }
-    .history-item{ background:#fff; border:1px solid #eef2ff; padding:10px; border-radius:8px; display:flex; justify-content:space-between; gap:8px; align-items:flex-start; margin-bottom:8px; }
-    .hist-left{ max-width:73%; }
-    .hist-right{ display:flex; gap:8px; align-items:center; }
-    .muted-block{ color:var(--muted); font-size:13px; margin-top:6px; }
-    .tiny{ font-size:12px; color:var(--muted); }
-    .danger{ background:#fee2e2; color:#b91c1c; padding:6px 8px; border-radius:6px; border:0; cursor:pointer; }
-    @media (max-width:800px){ .row{ flex-direction:column; } .hist-left{ max-width:100%; } .kode-list{ max-height:160px; } }
+    .kode-list{ max-height:250px; overflow-y:auto; border:1px solid #eef2ff; border-radius:8px; padding:6px; background:#fff; margin-top:5px;}
+    .kode-item{ padding:8px; border-radius:6px; cursor:pointer; font-size:13px; margin-bottom:2px; border: 1px solid transparent; }
+    .kode-item:hover{ background:#f8fafc; border-color: #e2e8f0; }
+    .kode-selected{ background:#eef2ff; border-left:4px solid var(--accent); font-weight:bold; }
+    .preview{ margin-top:12px; padding:15px; border-radius:8px; background:#0f172a; color:white; font-family:Georgia, serif; border: 1px solid #334155; }
+    textarea#hasil{ height:60px; margin-top:8px; font-weight:bold; color:var(--accent); font-size: 16px; text-align: center; }
+    .history-item{ background:#fff; border:1px solid #eef2ff; padding:12px; border-radius:8px; display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .tiny{ font-size:11px; color:var(--muted); }
+    .perihal-text { color: var(--accent); font-weight: 600; font-size: 12px; margin-top: 2px; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="card">
-      <h1>Generator Nomor Surat — SDN CILUAR 1 (Online History)</h1>
-      <p class="lead">Format: <code>KODE/NOMOR/NAMA SEKOLAH/BULAN_ROMAWI/TAHUN</code>. Riwayat tersimpan online ke Google Sheet.</p>
+      <h1>PEMBUATAN NOMOR SURAT SDN CILUAR 1</h1>
+      <p class="lead">Pilih kode, isi perihal, dan simpan secara otomatis ke riwayat.</p>
 
-      <!-- Search + Kode list -->
-      <label for="searchKode">Cari Kode Surat (ketik kata kunci atau kode)</label>
-      <div class="flex">
-        <input id="searchKode" type="text" placeholder="Contoh: guru, keuangan, 421.2, kesiswaan..." />
-        <button id="clearSearch" class="btn btn-ghost">Clear</button>
-      </div>
+      <label> Cari & Pilih Kode Surat</label>
+      <input id="searchKode" type="text" placeholder="Ketik kode atau nama (misal: 421 atau Guru)..." onkeyup="filterKode()"/>
+      <div id="kodeList" class="kode-list"></div>
 
-      <div style="display:flex; gap:12px; margin-top:8px;">
-        <div style="flex:1">
-          <label>Kode Surat (pilih)</label>
-          <div id="kodeList" class="kode-list" role="listbox" aria-label="Daftar kode surat"></div>
-        </div>
-
-        <div style="width:340px;">
-          <label>Keterangan Kode</label>
-          <div id="kodeDesc" style="padding:10px;border-radius:8px;background:#fbfdff;border:1px solid #eef2ff;min-height:68px;">Pilih kode untuk melihat keterangan.</div>
-        </div>
-      </div>
-
-      <!-- Nomor + Sekolah + Bulan + Tahun -->
-      <label>Nomor Surat</label>
-      <div class="row" style="align-items:flex-start;">
+      <div class="row">
         <div style="width:180px;">
-          <div class="flex" style="align-items:center;">
-            <button id="minusBtn" class="nbtn" title="Kurangi">−</button>
-            <input id="nomorInput" type="number" min="1" value="1" style="text-align:center;width:100px;"/>
-            <button id="plusBtn" class="nbtn" title="Tambah">+</button>
+          <label> Nomor Urut</label>
+          <div class="flex">
+            <button onclick="adjustNomor(-1)" class="nbtn">−</button>
+            <input id="nomorInput" type="number" min="1" value="1" style="text-align:center;"/>
+            <button onclick="adjustNomor(1)" class="nbtn">+</button>
           </div>
-          <div class="small" style="margin-top:6px;">Nomor disimpan otomatis per kombinasi kode+sekolah+tahun.</div>
         </div>
-
         <div style="flex:1;">
-          <label>Nama Sekolah</label>
+          <label> Sekolah</label>
           <select id="sekolahSelect">
             <option value="SDNCIL1">SDNCIL1</option>
-            <option value="LAINNYA">-- Isi Manual --</option>
-          </select>
-          <input id="sekolahCustom" type="text" placeholder="Isi nama sekolah jika pilih '-- Isi Manual --'" style="margin-top:8px; display:none;" />
-        </div>
-
-        <div style="width:170px;">
-          <label>Bulan</label>
-          <select id="bulanSelect">
-            <option value="I">I — Januari</option>
-            <option value="II">II — Februari</option>
-            <option value="III">III — Maret</option>
-            <option value="IV">IV — April</option>
-            <option value="V">V — Mei</option>
-            <option value="VI">VI — Juni</option>
-            <option value="VII">VII — Juli</option>
-            <option value="VIII">VIII — Agustus</option>
-            <option value="IX">IX — September</option>
-            <option value="X">X — Oktober</option>
-            <option value="XI">XI — November</option>
-            <option value="XII">XII — Desember</option>
+            <option value="LAINNYA">Manual...</option>
           </select>
         </div>
-
-        <div style="width:140px;">
-          <label>Tahun</label>
-          <input id="tahunInput" type="number" min="1900" max="3000" />
-        </div>
+        <div style="width:120px;"><label> Bulan</label><select id="bulanSelect"></select></div>
+        <div style="width:120px;"><label> Tahun</label><input id="tahunInput" type="number"/></div>
       </div>
 
-      <!-- Controls -->
-      <div class="controls">
-        <button id="generateBtn" class="btn btn-primary">Generate</button>
-        <button id="copyBtn" class="btn btn-ghost">Copy</button>
-        <button id="resetBtn" class="btn btn-muted">Reset</button>
-        <div style="flex:1"></div>
-        <div class="tiny" id="statusSaved" aria-live="polite"></div>
+      <label> Keterangan / Perihal Surat</label>
+      <input id="keteranganInput" type="text" placeholder="Contoh: Undangan Rapat Orang Tua, SK Pembagian Tugas..."/>
+
+      <div class="flex" style="margin-top:20px;">
+        <button id="generateBtn" class="btn btn-primary" style="flex:2">GENERATE & SIMPAN ONLINE</button>
+        <button id="copyBtn" class="btn btn-ghost" style="flex:1">Salin Nomor</button>
       </div>
 
-      <label style="margin-top:12px;">Hasil Nomor Surat</label>
-      <textarea id="hasil" readonly placeholder="Hasil akan muncul di sini..."></textarea>
-
+      <textarea id="hasil" readonly placeholder="Hasil nomor akan muncul di sini..."></textarea>
+      
       <div class="preview" id="previewArea" style="display:none;">
-        <div class="big" id="previewNumber">421.2/01/SDNCIL1/X/2025</div>
-        <div class="muted-block" id="previewMeta">SDNCIL1 — Kode 421.2 (Sekolah Dasar) — dibuat: <span id="previewCreated"></span></div>
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,0.08);margin:8px 0;">
-        <div style="font-size:14px;line-height:1.4;">
-          <div style="text-align:center;font-weight:700;">SURAT DINAS</div>
-          <div style="text-align:center;margin-top:6px;font-size:13px;">Nomor: <span id="previewNumberInline"></span></div>
-          <div style="margin-top:8px;font-size:13px;">Perihal: <span id="previewPerihal">[Isikan perihal jika perlu]</span></div>
-          <div style="margin-top:6px;font-size:13px;">Keterangan kode: <span id="previewKet"></span></div>
+        <div style="text-align:center; font-size:14px;">
+          <strong style="color: #94a3b8; font-size: 10px;">PRATINJAU FORMAT</strong><br>
+          <span id="previewNo" style="font-size: 16px; display: block; margin: 5px 0;"></span>
+          <span id="previewKet" style="font-style: italic; color: #cbd5e1;"></span>
         </div>
       </div>
     </div>
 
-    <!-- History Card -->
     <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <div>
-          <h2 style="margin:0;font-size:16px;">Riwayat Nomor Surat</h2>
-          <div class="small">Riwayat online tersimpan di Google Sheet. Juga disimpan lokal sebagai cache.</div>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button id="loadOnlineBtn" class="btn btn-primary">🔄 Muat Riwayat Online</button>
-          <button id="copyAllHistoryBtn" class="btn btn-ghost">📋 Salin Semua</button>
-          <button id="clearHistoryBtn" class="btn danger">🗑️ Hapus Riwayat Lokal</button>
+      <div class="flex" style="justify-content:space-between; margin-bottom: 15px;">
+        <h2 style="font-size:16px; margin:0;">Riwayat Penggunaan</h2>
+        <div class="flex">
+          <button onclick="loadOnline()" id="btnOnline" class="btn btn-ghost" style="font-size:12px; padding: 5px 10px;">🔄 Sinkron Online</button>
+          <button onclick="clearAllHistory()" class="btn btn-danger">Hapus Semua</button>
         </div>
       </div>
-
-      <div id="historyContainer" class="history-list" style="margin-top:12px;"></div>
-      <div id="noHistoryMsg" class="small" style="margin-top:8px; color:var(--muted); display:none;">Belum ada riwayat.</div>
-
-      <div style="margin-top:12px;">
-        <label>Nama Pembuat (opsional)</label>
-        <input id="pembuatInput" type="text" placeholder="Nama Anda, mis. Kepala Sekolah / Admin" />
+      <div style="margin-bottom: 15px;">
+        <label>Nama Pembuat (Identitas di Sheet)</label>
+        <input id="pembuatInput" type="text" placeholder="Nama Anda" style="font-size:12px;"/>
       </div>
+      <div id="historyContainer"></div>
     </div>
   </div>
 
   <script>
-  // =====================================
-  // DATA KODE KLASIFIKASI ARSIP SEKOLAH DASAR
-  // Berdasarkan Perwali Kota Bogor No.22 Tahun 2023
-  // =====================================
-  const kodeData = [
-  // ======================== 000 ========================
-  { kode: "000", ket: "Urusan Umum" },
-  { kode: "000.1", ket: "Ketatausahaan" },
-  { kode: "000.1.1", ket: "Persuratan / Tata Naskah Dinas" },
-  { kode: "000.1.2", ket: "Pengelolaan Surat Masuk dan Keluar" },
-  { kode: "000.1.3", ket: "Pengelolaan Buku Agenda" },
-  { kode: "000.1.4", ket: "Distribusi dan Ekspedisi Surat" },
-  { kode: "000.1.5", ket: "Penomoran Surat" },
-
-  { kode: "000.2", ket: "Kerumahtanggaan" },
-  { kode: "000.2.1", ket: "Kebersihan dan Keindahan" },
-  { kode: "000.2.2", ket: "Keamanan dan Ketertiban" },
-  { kode: "000.2.3", ket: "Piket dan Jadwal Petugas" },
-
-  { kode: "000.3", ket: "Perlengkapan" },
-  { kode: "000.3.1", ket: "Pengadaan Alat Tulis Kantor (ATK)" },
-  { kode: "000.3.2", ket: "Pengadaan Barang / Jasa" },
-  { kode: "000.3.3", ket: "Gudang dan Stok Barang" },
-
-  { kode: "000.4", ket: "Perpustakaan" },
-  { kode: "000.4.1", ket: "Pengadaan Buku" },
-  { kode: "000.4.2", ket: "Katalog dan Klasifikasi Buku" },
-  { kode: "000.4.3", ket: "Peminjaman dan Pengembalian Buku" },
-
-  { kode: "000.5", ket: "Kearsipan" },
-  { kode: "000.5.1", ket: "Arsip Dinamis" },
-  { kode: "000.5.2", ket: "Arsip Inaktif" },
-  { kode: "000.5.3", ket: "Pemusnahan Arsip" },
-  { kode: "000.5.4", ket: "Penyerahan Arsip" },
-
-  { kode: "000.6", ket: "Persandian" },
-  { kode: "000.6.1", ket: "Keamanan Informasi" },
-  { kode: "000.6.2", ket: "Penggunaan Kode / Sandi" },
-
-  { kode: "000.7", ket: "Perencanaan" },
-  { kode: "000.7.1", ket: "Rencana Kerja Tahunan (RKT)" },
-  { kode: "000.7.2", ket: "Program Kerja Sekolah" },
-
-  { kode: "000.8", ket: "Organisasi dan Tata Kerja" },
-  { kode: "000.8.1", ket: "Struktur Organisasi Sekolah" },
-  { kode: "000.8.2", ket: "Tugas Pokok dan Fungsi" },
-
-  { kode: "000.9", ket: "Penelitian dan Pengembangan" },
-
-  // ======================== 100 ========================
-  { kode: "100", ket: "Pemerintahan dan Administrasi Resmi Sekolah" },
-
-  { kode: "100.1", ket: "Kepala Sekolah" },
-  { kode: "100.1.1", ket: "Kebijakan dan Arahan Kepala Sekolah" },
-  { kode: "100.1.2", ket: "Surat Tugas Kepala Sekolah" },
-  { kode: "100.1.3", ket: "Surat Rekomendasi Kepala Sekolah" },
-
-  { kode: "100.2", ket: "Peraturan Sekolah" },
-  { kode: "100.2.1", ket: "Tata Tertib Sekolah" },
-  { kode: "100.2.2", ket: "Peraturan Akademik / Pembelajaran" },
-  { kode: "100.2.3", ket: "Peraturan Kegiatan Ekstrakurikuler" },
-  { kode: "100.2.4", ket: "Peraturan Kesiswaan" },
-  { kode: "100.2.5", ket: "Peraturan Guru dan Pegawai" },
-
-  { kode: "100.3", ket: "Hukum dan Perundang-undangan" },
-  { kode: "100.3.1", ket: "Peraturan Pemerintah Terkait Pendidikan" },
-  { kode: "100.3.2", ket: "Peraturan Kemendikbud" },
-  { kode: "100.3.3", ket: "Peraturan Daerah / Perwali" },
-  { kode: "100.3.4", ket: "Juklak, Juknis, SOP Sekolah" },
-  { kode: "100.3.5", ket: "Instruksi, Edaran, dan Surat Himbauan" },
-  { kode: "100.3.6", ket: "Keputusan Kepala Sekolah (SK)" },
-  { kode: "100.3.7", ket: "Nota Dinas / Teguran / Peringatan" },
-
-  { kode: "100.4", ket: "Kerja Sama dan Kemitraan Sekolah" },
-  { kode: "100.4.1", ket: "MOU / Perjanjian Kerja Sama" },
-  { kode: "100.4.2", ket: "Kerja Sama dengan Orang Tua / Komite" },
-  { kode: "100.4.3", ket: "Kerja Sama dengan Instansi Pemerintah" },
-  { kode: "100.4.4", ket: "Kerja Sama dengan Dunia Usaha / Sponsor" },
-
-  { kode: "100.5", ket: "Administrasi Lembaga Sekolah" },
-  { kode: "100.5.1", ket: "Pengajuan NPSN / Data Pokok Pendidikan" },
-  { kode: "100.5.2", ket: "Laporan Kepada Dinas Pendidikan" },
-  { kode: "100.5.3", ket: "Akreditasi Sekolah" },
-  { kode: "100.5.4", ket: "Kurikulum Tingkat Satuan Pendidikan (KTSP)" },
-
-  { kode: "100.6", ket: "Transparansi dan Akuntabilitas" },
-  { kode: "100.6.1", ket: "Laporan Penyelenggaraan Pendidikan" },
-  { kode: "100.6.2", ket: "Publikasi dan Informasi Resmi Sekolah" },
-
-  { kode: "100.7", ket: "Komite Sekolah" },
-  { kode: "100.7.1", ket: "Program Kerja Komite" },
-  { kode: "100.7.2", ket: "Laporan Pertanggungjawaban Komite" },
-  { kode: "100.7.3", ket: "Rapat dan Notulen Komite" },
-
-  // ======================== 200 ========================
-  { kode: "200", ket: "Kegiatan Organisasi, Hubungan Masyarakat, dan Komunikasi Sekolah" },
-
-  { kode: "200.1", ket: "Organisasi Sekolah" },
-  { kode: "200.1.1", ket: "Struktur Organisasi Sekolah" },
-  { kode: "200.1.2", ket: "Tugas Pokok dan Fungsi / Tupoksi" },
-  { kode: "200.1.3", ket: "Unit / Seksi / Koordinator Sekolah" },
-  { kode: "200.1.4", ket: "Rapat Internal Guru dan Pegawai" },
-  { kode: "200.1.5", ket: "Agenda dan Notulen Rapat" },
-
-  { kode: "200.2", ket: "Hubungan Masyarakat (Humas)" },
-  { kode: "200.2.1", ket: "Informasi Publik dan Publikasi Sekolah" },
-  { kode: "200.2.2", ket: "Pengelolaan Website / Media Sosial Sekolah" },
-  { kode: "200.2.3", ket: "Dokumentasi Kegiatan Sekolah" },
-  { kode: "200.2.4", ket: "Pengaduan Masyarakat / Layanan Informasi" },
-  { kode: "200.2.5", ket: "Kerjasama Publikasi / Media" },
-
-  { kode: "200.3", ket: "Kerjasama dan Kemitraan Sekolah" },
-  { kode: "200.3.1", ket: "Kerjasama dengan Komite Sekolah" },
-  { kode: "200.3.2", ket: "Kerjasama dengan Orang Tua (Parenting)" },
-  { kode: "200.3.3", ket: "Kerjasama dengan Instansi Pemerintah" },
-  { kode: "200.3.4", ket: "Kerjasama dengan Dunia Usaha / Sponsor" },
-  { kode: "200.3.5", ket: "Kerjasama Lingkungan / Masyarakat Sekitar" },
-
-  { kode: "200.4", ket: "Kebijakan Strategis Sekolah" },
-  { kode: "200.4.1", ket: "Musyawarah Sekolah / Perencanaan Tahunan" },
-  { kode: "200.4.2", ket: "Program Kerja Tahunan & Evaluasi" },
-  { kode: "200.4.3", ket: "Laporan Kepada Dinas / Kelurahan" },
-
-  { kode: "200.5", ket: "Komunikasi Sekolah" },
-  { kode: "200.5.1", ket: "Surat Edaran / Informasi Resmi" },
-  { kode: "200.5.2", ket: "Pemberitahuan untuk Orang Tua" },
-  { kode: "200.5.3", ket: "Panggilan Orang Tua / Koordinasi Kesiswaan" },
-  { kode: "200.5.4", ket: "Publikasi Event Sekolah" },
-
-  { kode: "200.6", ket: "Kegiatan Seremonial Sekolah" },
-  { kode: "200.6.1", ket: "Upacara Hari Besar Nasional" },
-  { kode: "200.6.2", ket: "Peringatan Hari Besar Keagamaan" },
-  { kode: "200.6.3", ket: "Event Sekolah / Expo / Pentas Seni" },
-
-  { kode: "200.7", ket: "Dokumentasi" },
-  { kode: "200.7.1", ket: "Foto Kegiatan Sekolah" },
-  { kode: "200.7.2", ket: "Video Kegiatan Sekolah" },
-  { kode: "200.7.3", ket: "Publikasi di Media" },
-
-  // ======================== 300 ========================
-  { kode: "300", ket: "Keamanan, Ketertiban, dan Penanggulangan Bencana Sekolah" },
-
-  { kode: "300.1", ket: "Ketertiban Sekolah" },
-  { kode: "300.1.1", ket: "Tata Tertib Sekolah (Disiplin Guru & Siswa)" },
-  { kode: "300.1.2", ket: "Pelanggaran Ringan Siswa" },
-  { kode: "300.1.3", ket: "Pelanggaran Sedang & Berat Siswa" },
-  { kode: "300.1.4", ket: "Pembinaan & Tindakan Disiplin" },
-  { kode: "300.1.5", ket: "Pelaporan Kasus Kedisiplinan" },
-
-  { kode: "300.2", ket: "Keamanan Lingkungan Sekolah" },
-  { kode: "300.2.1", ket: "Petugas Keamanan / Satpam / Penjaga Sekolah" },
-  { kode: "300.2.2", ket: "Laporan Keamanan Harian / Buku Piket" },
-  { kode: "300.2.3", ket: "Pengawasan Aset Berharga" },
-  { kode: "300.2.4", ket: "Pengamanan Gedung & Ruangan" },
-  { kode: "300.2.5", ket: "Kejadian Luar Biasa / Insiden Keamanan" },
-
-  { kode: "300.3", ket: "Kesiapsiagaan dan Simulasi Bencana" },
-  { kode: "300.3.1", ket: "Simulasi Gempa / Kebakaran / Bencana Lain" },
-  { kode: "300.3.2", ket: "Tim Siaga Bencana Sekolah (TSBS)" },
-  { kode: "300.3.3", ket: "Sarana Darurat (APAR, P3K, Titik Kumpul)" },
-  { kode: "300.3.4", ket: "Pelaporan Kondisi Darurat" },
-
-  { kode: "300.4", ket: "Penanggulangan Keadaan Darurat" },
-  { kode: "300.4.1", ket: "Kebakaran" },
-  { kode: "300.4.2", ket: "Banjir / Longsor" },
-  { kode: "300.4.3", ket: "Kecelakaan di Area Sekolah" },
-  { kode: "300.4.4", ket: "Tindakan Pertolongan Pertama (P3K)" },
-
-  { kode: "300.5", ket: "Lingkungan Aman & Sehat" },
-  { kode: "300.5.1", ket: "Program Sekolah Sehat" },
-  { kode: "300.5.2", ket: "Pemeriksaan Lingkungan (Jentik, Kebersihan)" },
-  { kode: "300.5.3", ket: "Pemantauan Tempat Berbahaya / Zona Merah" },
-
-  { kode: "300.6", ket: "Piket dan Penjagaan Sekolah" },
-  { kode: "300.6.1", ket: "Jadwal Piket Guru" },
-  { kode: "300.6.2", ket: "Jadwal Piket Siswa" },
-  { kode: "300.6.3", ket: "Laporan Harian Piket" },
-  { kode: "300.6.4", ket: "Piket Kebersihan / Jumat Bersih" },
-
-  { kode: "300.7", ket: "Inspeksi dan Audit Keamanan" },
-  { kode: "300.7.1", ket: "Pemeriksaan Kebersihan & Kerapihan Kelas" },
-  { kode: "300.7.2", ket: "Monitoring Alat Pemadam / APAR" },
-  { kode: "300.7.3", ket: "Audit Keamanan Bangunan & Sarpras" },
-
-  { kode: "300.8", ket: "Penanganan Kriminalitas" },
-  { kode: "300.8.1", ket: "Pencurian di Sekolah" },
-  { kode: "300.8.2", ket: "Perusakan Fasilitas Sekolah" },
-  { kode: "300.8.3", ket: "Koordinasi dengan Polsek / Babinsa" },
-
-  // ======================== 400 ========================
-  { kode: "400", ket: "Bidang Pendidikan" },
-
-  { kode: "400.1", ket: "Pendidikan Anak Usia Dini (PAUD)" },
-  { kode: "400.1.1", ket: "Pengelolaan PAUD" },
-  { kode: "400.1.2", ket: "Kurikulum dan Pembelajaran PAUD" },
-  { kode: "400.1.3", ket: "Bahan Ajar / Media Belajar PAUD" },
-  { kode: "400.1.4", ket: "Bantuan Operasional PAUD" },
-
-  { kode: "400.2", ket: "Pemberdayaan Perempuan & Perlindungan Anak" },
-  { kode: "400.2.1", ket: "Sekolah Ramah Anak (SRA)" },
-  { kode: "400.2.2", ket: "Kasus Anak / Pelaporan Kekerasan" },
-
-  { kode: "400.3", ket: "Pendidikan (Umum)" },
-  { kode: "400.3.1", ket: "Kebijakan Pendidikan" },
-  { kode: "400.3.2", ket: "Pendidikan Kesetaraan / PKBM" },
-  { kode: "400.3.3", ket: "Program Pendidikan Masyarakat" },
-  { kode: "400.3.3.1", ket: "Bantuan Pendidikan Masyarakat" },
-  { kode: "400.3.3.2", ket: "Pelatihan & Kegiatan Pendidikan Masyarakat" },
-  { kode: "400.3.3.3", ket: "Lomba dan Penghargaan Pendidikan Masyarakat" },
-
-  { kode: "400.3.5", ket: "Pendidikan Dasar (SD & SMP)" },
-  { kode: "400.3.5.1", ket: "Kurikulum dan Bahan Ajar SD" },
-  { kode: "400.3.5.1.1", ket: "Modul Ajar / RPP / Silabus SD" },
-  { kode: "400.3.5.1.2", ket: "Media Pembelajaran SD" },
-
-  { kode: "400.3.5.2", ket: "Bantuan Sekolah / BOS / DAK SD" },
-  { kode: "400.3.5.2.1", ket: "Pengajuan & Realisasi BOS" },
-  { kode: "400.3.5.2.2", ket: "Laporan Pertanggungjawaban BOS" },
-
-  { kode: "400.3.5.3", ket: "Pelatihan / Bimtek Guru SD" },
-
-  { kode: "400.3.5.4", ket: "Lomba, Festival, dan Penghargaan Siswa SD" },
-  { kode: "400.3.5.4.1", ket: "Lomba Akademik (MTK, IPA, Literasi)" },
-  { kode: "400.3.5.4.2", ket: "Lomba Non-Akademik (Seni, Olahraga)" },
-
-  { kode: "400.3.5.5", ket: "BOS Reguler SD" },
-  { kode: "400.3.5.6", ket: "Bantuan Siswa Miskin / PIP / BSM SD" },
-
-  { kode: "400.3.6", ket: "Pendidikan Khusus / Inklusif" },
-  { kode: "400.3.6.1", ket: "Kurikulum Sekolah Inklusif" },
-  { kode: "400.3.6.2", ket: "Alat Bantu Pembelajaran ABK" },
-  { kode: "400.3.6.3", ket: "Lomba / Kegiatan Siswa Berkebutuhan Khusus" },
-
-  { kode: "400.3.7", ket: "Pembinaan Guru dan Tendik" },
-  { kode: "400.3.7.1", ket: "Pendataan Guru" },
-  { kode: "400.3.7.2", ket: "Uji Kompetensi Guru" },
-  { kode: "400.3.7.3", ket: "Sertifikasi Guru" },
-  { kode: "400.3.7.4", ket: "Penghargaan Guru Berprestasi" },
-  { kode: "400.3.7.5", ket: "Peningkatan Kesejahteraan Guru" },
-
-  { kode: "400.3.11", ket: "Penilaian Akademik SD" },
-  { kode: "400.3.11.1", ket: "Penilaian Harian (PH)" },
-  { kode: "400.3.11.2", ket: "Penilaian Tengah Semester (PTS)" },
-  { kode: "400.3.11.3", ket: "Penilaian Akhir Semester (PAS)" },
-  { kode: "400.3.11.4", ket: "Asesmen Sumatif" },
-
-  { kode: "400.3.12", ket: "Penilaian Non Akademik" },
-  { kode: "400.3.12.1", ket: "Data Peserta Didik / Guru / Tendik" },
-  { kode: "400.3.12.2", ket: "Data Satuan Pendidikan / Proses Belajar" },
-
-  { kode: "400.3.13", ket: "Prasarana dan Sarana Pendidikan" },
-  { kode: "400.3.13.1", ket: "Prasarana Sekolah (Gedung, Kelas)" },
-  { kode: "400.3.13.2", ket: "Sarana Pembelajaran" },
-  { kode: "400.3.13.3", ket: "Monitoring dan Evaluasi Sarpras" },
-
-  { kode: "400.4", ket: "Olahraga dan Kebugaran" },
-  { kode: "400.4.2.1", ket: "Olahraga Pendidikan Dasar" },
-
-  { kode: "400.5", ket: "Kepemudaan dan Pramuka" },
-  { kode: "400.5.1", ket: "Kegiatan Pramuka SD" },
-  { kode: "400.5.2", ket: "Pangkalan Gugus Depan SD" },
-
-  { kode: "400.6", ket: "Kebudayaan dan Seni" },
-  { kode: "400.6.1", ket: "Pentas Seni / Festival Budaya" },
-  { kode: "400.6.2", ket: "Pembinaan Seni Tari / Musik / Teater" },
-
-  { kode: "400.7", ket: "Kesehatan Sekolah" },
-  { kode: "400.7.1", ket: "UKS / Kesehatan Peserta Didik" },
-  { kode: "400.7.2", ket: "Pemeriksaan Kesehatan Rutin" },
-  { kode: "400.7.3", ket: "Program Gizi Anak Sekolah" },
-
-  // ======================== 500 ========================
-  { kode: "500", ket: "Sarana dan Prasarana Sekolah" },
-
-  { kode: "500.1", ket: "Inventaris Barang / Aset Sekolah" },
-  { kode: "500.1.1", ket: "Pendataan Aset / Kodefikasi Barang" },
-  { kode: "500.1.2", ket: "Mutasi Barang / Penghapusan Aset" },
-  { kode: "500.1.3", ket: "Peminjaman Barang" },
-
-  { kode: "500.2", ket: "Pemeliharaan Gedung & Fasilitas" },
-  { kode: "500.2.1", ket: "Perbaikan Gedung / Kelas" },
-  { kode: "500.2.2", ket: "Pemeliharaan Air, Listrik, Toilet" },
-  { kode: "500.2.3", ket: "Renovasi dan Pembangunan" },
-
-  { kode: "500.3", ket: "Peralatan Pembelajaran" },
-  { kode: "500.3.1", ket: "Meja, Kursi, Whiteboard" },
-  { kode: "500.3.2", ket: "Proyektor, Laptop, Printer" },
-  { kode: "500.3.3", ket: "Alat Peraga IPA/Matematika" },
-
-  { kode: "500.4", ket: "Lingkungan Sekolah" },
-  { kode: "500.4.1", ket: "Taman Sekolah / Penghijauan" },
-  { kode: "500.4.2", ket: "Kebersihan Lingkungan" },
-  { kode: "500.4.3", ket: "Tempat Sampah & Pengelolaan Limbah" },
-
-  // ======================== 600 ========================
-  { kode: "600", ket: "Keamanan dan Ketertiban Umum" },
-  { kode: "600.1", ket: "Perlindungan Masyarakat" },
-  { kode: "600.1.1", ket: "Koordinasi dengan RT/RW" },
-  { kode: "600.1.2", ket: "Koordinasi dengan Kelurahan" },
-
-  { kode: "600.2", ket: "Kamtibmas" },
-  { kode: "600.2.1", ket: "Koordinasi Polsek / Babinsa" },
-  { kode: "600.2.2", ket: "Laporan Keamanan Wilayah Sekitar" },
-
-  // ======================== 700 ========================
-  { kode: "700", ket: "Komunikasi, Informasi, dan Dokumentasi" },
-
-  { kode: "700.1", ket: "Media Komunikasi Sekolah" },
-  { kode: "700.1.1", ket: "Pengelolaan Website Sekolah" },
-  { kode: "700.1.2", ket: "Publikasi Media Sosial" },
-  { kode: "700.1.3", ket: "Siaga Informasi / Papan Pengumuman" },
-
-  { kode: "700.2", ket: "Hubungan Media" },
-  { kode: "700.2.1", ket: "Dokumentasi Foto" },
-  { kode: "700.2.2", ket: "Dokumentasi Video" },
-  { kode: "700.2.3", ket: "Publikasi Berita Sekolah" },
-
-  { kode: "700.3", ket: "Layanan Informasi Publik" },
-  { kode: "700.3.1", ket: "Layanan Permohonan Informasi" },
-  { kode: "700.3.2", ket: "Pengaduan Masyarakat" },
-
-  // ======================== 800 ========================
-  { kode: "800", ket: "Kepegawaian / Guru / Tendik" },
-
-  { kode: "800.1", ket: "Pendataan Guru dan Tendik" },
-  { kode: "800.1.1", ket: "Data Guru ASN / PPPK" },
-  { kode: "800.1.2", ket: "Data Guru Honorer" },
-  { kode: "800.1.3", ket: "Data Operator / TU" },
-
-  { kode: "800.2", ket: "Absensi dan Disiplin Pegawai" },
-  { kode: "800.2.1", ket: "Presensi Harian" },
-  { kode: "800.2.2", ket: "Ketidakhadiran / Sakit / Izin" },
-  { kode: "800.2.3", ket: "Laporan Disiplin PNS/Non-PNS" },
-
-  { kode: "800.3", ket: "Cuti Pegawai" },
-  { kode: "800.3.1", ket: "Cuti Tahunan" },
-  { kode: "800.3.2", ket: "Cuti Sakit" },
-  { kode: "800.3.3", ket: "Cuti Melahirkan" },
-  { kode: "800.3.4", ket: "Cuti Penting / Dispensasi" },
-
-  { kode: "800.4", ket: "Pengembangan Guru" },
-  { kode: "800.4.1", ket: "Bimtek / Diklat / Workshop" },
-  { kode: "800.4.2", ket: "Kegiatan KKG / MGMP" },
-  { kode: "800.4.3", ket: "Sertifikat Pelatihan" },
-
-  { kode: "800.5", ket: "Karier dan Sertifikasi Guru" },
-  { kode: "800.5.1", ket: "Sertifikasi Pendidik" },
-  { kode: "800.5.2", ket: "Kenaikan Pangkat" },
-  { kode: "800.5.3", ket: "Penilaian Kinerja Guru (PKG)" },
-
-  // ======================== 900 ========================
-  { kode: "900", ket: "Keuangan Sekolah" },
-
-  { kode: "900.1", ket: "Dana BOS / DAK / Bantuan Pendidikan" },
-  { kode: "900.1.1", ket: "Rencana Kegiatan dan Anggaran Sekolah (RKAS)" },
-  { kode: "900.1.2", ket: "Realisasi dan Pembukuan BOS" },
-  { kode: "900.1.3", ket: "Laporan BOS Triwulan" },
-
-  { kode: "900.2", ket: "SPJ dan Pertanggungjawaban" },
-  { kode: "900.2.1", ket: "Bukti Pembelian / Nota" },
-  { kode: "900.2.2", ket: "Laporan SPJ Tahunan" },
-  { kode: "900.2.3", ket: "Kwitansi dan Arsip Pembayaran" },
-
-  { kode: "900.3", ket: "Komite / Donasi / Iuran" },
-  { kode: "900.3.1", ket: "Penerimaan Iuran Komite" },
-  { kode: "900.3.2", ket: "Laporan Penggunaan Dana Komite" },
-
-  { kode: "900.4", ket: "Pengelolaan Barang & Aset Keuangan" },
-  { kode: "900.4.1", ket: "Pengadaan Barang Bersumber Dana BOS" },
-  { kode: "900.4.2", ket: "Audit Keuangan / Pemeriksaan Inspektorat" }
-];
-
-    // ================
-    // Helpers & Elements
-    // ================
     const $ = id => document.getElementById(id);
-    const now = new Date();
-    const defaultYear = now.getFullYear();
-    const defaultMonthIndex = now.getMonth();
+    const API_URL = "https://script.google.com/macros/s/AKfycbx_us6kcd6rAIk8YjIhxpysE6ru8yYc6YZwdR2XhjCRVjDBWoiQZor9-S1zWRGHkFyjNQ/exec";
+    const DB_NAME = 'surat_db_ciluar1';
 
-    function padTwo(n){ return String(n).padStart(2,'0'); }
-    function formatIndoDate(isoString){
-      const d = new Date(isoString);
-      const opt = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
-      return d.toLocaleDateString('id-ID', opt);
+    // DATABASE KODE LENGKAP
+    const kodeData = [
+      // ======================== 000 ========================
+      { kode: "000", ket: "Urusan Umum" },
+      { kode: "000.1", ket: "Ketatausahaan" },
+      { kode: "000.1.1", ket: "Persuratan / Tata Naskah Dinas" },
+      { kode: "000.1.2", ket: "Pengelolaan Surat Masuk dan Keluar" },
+      { kode: "000.1.3", ket: "Pengelolaan Buku Agenda" },
+      { kode: "000.1.4", ket: "Distribusi dan Ekspedisi Surat" },
+      { kode: "000.1.5", ket: "Penomoran Surat" },
+      { kode: "000.2", ket: "Kerumahtanggaan" },
+      { kode: "000.2.1", ket: "Kebersihan dan Keindahan" },
+      { kode: "000.2.2", ket: "Keamanan dan Ketertiban" },
+      { kode: "000.2.3", ket: "Piket dan Jadwal Petugas" },
+      { kode: "000.3", ket: "Perlengkapan" },
+      { kode: "000.3.1", ket: "Pengadaan Alat Tulis Kantor (ATK)" },
+      { kode: "000.3.2", ket: "Pengadaan Barang / Jasa" },
+      { kode: "000.3.3", ket: "Gudang dan Stok Barang" },
+      { kode: "000.4", ket: "Perpustakaan" },
+      { kode: "000.4.1", ket: "Pengadaan Buku" },
+      { kode: "000.4.2", ket: "Katalog dan Klasifikasi Buku" },
+      { kode: "000.4.3", ket: "Peminjaman dan Pengembalian Buku" },
+      { kode: "000.5", ket: "Kearsipan" },
+      { kode: "000.5.1", ket: "Arsip Dinamis" },
+      { kode: "000.5.2", ket: "Arsip Inaktif" },
+      { kode: "000.5.3", ket: "Pemusnahan Arsip" },
+      { kode: "000.5.4", ket: "Penyerahan Arsip" },
+      { kode: "000.6", ket: "Persandian" },
+      { kode: "000.6.1", ket: "Keamanan Informasi" },
+      { kode: "000.6.2", ket: "Penggunaan Kode / Sandi" },
+      { kode: "000.7", ket: "Perencanaan" },
+      { kode: "000.7.1", ket: "Rencana Kerja Tahunan (RKT)" },
+      { kode: "000.7.2", ket: "Program Kerja Sekolah" },
+      { kode: "000.8", ket: "Organisasi dan Tata Kerja" },
+      { kode: "000.8.1", ket: "Struktur Organisasi Sekolah" },
+      { kode: "000.8.2", ket: "Tugas Pokok dan Fungsi" },
+      { kode: "000.9", ket: "Penelitian dan Pengembangan" },
+
+      // ======================== 100 ========================
+      { kode: "100", ket: "Pemerintahan dan Administrasi Resmi Sekolah" },
+      { kode: "100.1", ket: "Kepala Sekolah" },
+      { kode: "100.1.1", ket: "Kebijakan dan Arahan Kepala Sekolah" },
+      { kode: "100.1.2", ket: "Surat Tugas Kepala Sekolah" },
+      { kode: "100.1.3", ket: "Surat Rekomendasi Kepala Sekolah" },
+      { kode: "100.2", ket: "Peraturan Sekolah" },
+      { kode: "100.2.1", ket: "Tata Tertib Sekolah" },
+      { kode: "100.2.2", ket: "Peraturan Akademik / Pembelajaran" },
+      { kode: "100.2.3", ket: "Peraturan Kegiatan Ekstrakurikuler" },
+      { kode: "100.2.4", ket: "Peraturan Kesiswaan" },
+      { kode: "100.2.5", ket: "Peraturan Guru dan Pegawai" },
+      { kode: "100.3", ket: "Hukum dan Perundang-undangan" },
+      { kode: "100.3.1", ket: "Peraturan Pemerintah Terkait Pendidikan" },
+      { kode: "100.3.2", ket: "Peraturan Kemendikbud" },
+      { kode: "100.3.3", ket: "Peraturan Daerah / Perwali" },
+      { kode: "100.3.4", ket: "Juklak, Juknis, SOP Sekolah" },
+      { kode: "100.3.5", ket: "Instruksi, Edaran, dan Surat Himbauan" },
+      { kode: "100.3.6", ket: "Keputusan Kepala Sekolah (SK)" },
+      { kode: "100.3.7", ket: "Nota Dinas / Teguran / Peringatan" },
+      { kode: "100.4", ket: "Kerja Sama dan Kemitraan Sekolah" },
+      { kode: "100.4.1", ket: "MOU / Perjanjian Kerja Sama" },
+      { kode: "100.4.2", ket: "Kerja Sama dengan Orang Tua / Komite" },
+      { kode: "100.4.3", ket: "Kerja Sama dengan Instansi Pemerintah" },
+      { kode: "100.4.4", ket: "Kerja Sama dengan Dunia Usaha / Sponsor" },
+      { kode: "100.5", ket: "Administrasi Lembaga Sekolah" },
+      { kode: "100.5.1", ket: "Pengajuan NPSN / Data Pokok Pendidikan" },
+      { kode: "100.5.2", ket: "Laporan Kepada Dinas Pendidikan" },
+      { kode: "100.5.3", ket: "Akreditasi Sekolah" },
+      { kode: "100.5.4", ket: "Kurikulum Tingkat Satuan Pendidikan (KTSP)" },
+      { kode: "100.6", ket: "Transparansi dan Akuntabilitas" },
+      { kode: "100.6.1", ket: "Laporan Penyelenggaraan Pendidikan" },
+      { kode: "100.6.2", ket: "Publikasi dan Informasi Resmi Sekolah" },
+      { kode: "100.7", ket: "Komite Sekolah" },
+      { kode: "100.7.1", ket: "Program Kerja Komite" },
+      { kode: "100.7.2", ket: "Laporan Pertanggungjawaban Komite" },
+      { kode: "100.7.3", ket: "Rapat dan Notulen Komite" },
+
+      // ======================== 200 ========================
+      { kode: "200", ket: "Kegiatan Organisasi, Hubungan Masyarakat, dan Komunikasi Sekolah" },
+      { kode: "200.1", ket: "Organisasi Sekolah" },
+      { kode: "200.1.1", ket: "Struktur Organisasi Sekolah" },
+      { kode: "200.1.2", ket: "Tugas Pokok dan Fungsi / Tupoksi" },
+      { kode: "200.1.3", ket: "Unit / Seksi / Koordinator Sekolah" },
+      { kode: "200.1.4", ket: "Rapat Internal Guru dan Pegawai" },
+      { kode: "200.1.5", ket: "Agenda dan Notulen Rapat" },
+      { kode: "200.2", ket: "Hubungan Masyarakat (Humas)" },
+      { kode: "200.2.1", ket: "Informasi Publik dan Publikasi Sekolah" },
+      { kode: "200.2.2", ket: "Pengelolaan Website / Media Sosial Sekolah" },
+      { kode: "200.2.3", ket: "Dokumentasi Kegiatan Sekolah" },
+      { kode: "200.2.4", ket: "Pengaduan Masyarakat / Layanan Informasi" },
+      { kode: "200.2.5", ket: "Kerjasama Publikasi / Media" },
+      { kode: "200.3", ket: "Kerjasama dan Kemitraan Sekolah" },
+      { kode: "200.3.1", ket: "Kerjasama dengan Komite Sekolah" },
+      { kode: "200.3.2", ket: "Kerjasama dengan Orang Tua (Parenting)" },
+      { kode: "200.3.3", ket: "Kerjasama dengan Instansi Pemerintah" },
+      { kode: "200.3.4", ket: "Kerjasama dengan Dunia Usaha / Sponsor" },
+      { kode: "200.3.5", ket: "Kerjasama Lingkungan / Masyarakat Sekitar" },
+      { kode: "200.4", ket: "Kebijakan Strategis Sekolah" },
+      { kode: "200.4.1", ket: "Musyawarah Sekolah / Perencanaan Tahunan" },
+      { kode: "200.4.2", ket: "Program Kerja Tahunan & Evaluasi" },
+      { kode: "200.4.3", ket: "Laporan Kepada Dinas / Kelurahan" },
+      { kode: "200.5", ket: "Komunikasi Sekolah" },
+      { kode: "200.5.1", ket: "Surat Edaran / Informasi Resmi" },
+      { kode: "200.5.2", ket: "Pemberitahuan untuk Orang Tua" },
+      { kode: "200.5.3", ket: "Panggilan Orang Tua / Koordinasi Kesiswaan" },
+      { kode: "200.5.4", ket: "Publikasi Event Sekolah" },
+      { kode: "200.6", ket: "Kegiatan Seremonial Sekolah" },
+      { kode: "200.6.1", ket: "Upacara Hari Besar Nasional" },
+      { kode: "200.6.2", ket: "Peringatan Hari Besar Keagamaan" },
+      { kode: "200.6.3", ket: "Event Sekolah / Expo / Pentas Seni" },
+      { kode: "200.7", ket: "Dokumentasi" },
+      { kode: "200.7.1", ket: "Foto Kegiatan Sekolah" },
+      { kode: "200.7.2", ket: "Video Kegiatan Sekolah" },
+      { kode: "200.7.3", ket: "Publikasi di Media" },
+
+      // ======================== 300 ========================
+      { kode: "300", ket: "Keamanan, Ketertiban, dan Penanggulangan Bencana Sekolah" },
+      { kode: "300.1", ket: "Ketertiban Sekolah" },
+      { kode: "300.1.1", ket: "Tata Tertib Sekolah (Disiplin Guru & Siswa)" },
+      { kode: "300.1.2", ket: "Pelanggaran Ringan Siswa" },
+      { kode: "300.1.3", ket: "Pelanggaran Sedang & Berat Siswa" },
+      { kode: "300.1.4", ket: "Pembinaan & Tindakan Disiplin" },
+      { kode: "300.1.5", ket: "Pelaporan Kasus Kedisiplinan" },
+      { kode: "300.2", ket: "Keamanan Lingkungan Sekolah" },
+      { kode: "300.2.1", ket: "Petugas Keamanan / Satpam / Penjaga Sekolah" },
+      { kode: "300.2.2", ket: "Laporan Keamanan Harian / Buku Piket" },
+      { kode: "300.2.3", ket: "Pengawasan Aset Berharga" },
+      { kode: "300.2.4", ket: "Pengamanan Gedung & Ruangan" },
+      { kode: "300.2.5", ket: "Kejadian Luar Biasa / Insiden Keamanan" },
+      { kode: "300.3", ket: "Kesiapsiagaan dan Simulasi Bencana" },
+      { kode: "300.3.1", ket: "Simulasi Gempa / Kebakaran / Bencana Lain" },
+      { kode: "300.3.2", ket: "Tim Siaga Bencana Sekolah (TSBS)" },
+      { kode: "300.3.3", ket: "Sarana Darurat (APAR, P3K, Titik Kumpul)" },
+      { kode: "300.3.4", ket: "Pelaporan Kondisi Darurat" },
+      { kode: "300.4", ket: "Penanggulangan Keadaan Darurat" },
+      { kode: "300.4.1", ket: "Kebakaran" },
+      { kode: "300.4.2", ket: "Banjir / Longsor" },
+      { kode: "300.4.3", ket: "Kecelakaan di Area Sekolah" },
+      { kode: "300.4.4", ket: "Tindakan Pertolongan Pertama (P3K)" },
+      { kode: "300.5", ket: "Lingkungan Aman & Sehat" },
+      { kode: "300.5.1", ket: "Program Sekolah Sehat" },
+      { kode: "300.5.2", ket: "Pemeriksaan Lingkungan (Jentik, Kebersihan)" },
+      { kode: "300.5.3", ket: "Pemantauan Tempat Berbahaya / Zona Merah" },
+      { kode: "300.6", ket: "Piket dan Penjagaan Sekolah" },
+      { kode: "300.6.1", ket: "Jadwal Piket Guru" },
+      { kode: "300.6.2", ket: "Jadwal Piket Siswa" },
+      { kode: "300.6.3", ket: "Laporan Harian Piket" },
+      { kode: "300.6.4", ket: "Piket Kebersihan / Jumat Bersih" },
+      { kode: "300.7", ket: "Inspeksi dan Audit Keamanan" },
+      { kode: "300.7.1", ket: "Pemeriksaan Kebersihan & Kerapihan Kelas" },
+      { kode: "300.7.2", ket: "Monitoring Alat Pemadam / APAR" },
+      { kode: "300.7.3", ket: "Audit Keamanan Bangunan & Sarpras" },
+      { kode: "300.8", ket: "Penanganan Kriminalitas" },
+      { kode: "300.8.1", ket: "Pencurian di Sekolah" },
+      { kode: "300.8.2", ket: "Perusakan Fasilitas Sekolah" },
+      { kode: "300.8.3", ket: "Koordinasi dengan Polsek / Babinsa" },
+
+      // ======================== 400 ========================
+      { kode: "400", ket: "Bidang Pendidikan" },
+      { kode: "400.1", ket: "Pendidikan Anak Usia Dini (PAUD)" },
+      { kode: "400.1.1", ket: "Pengelolaan PAUD" },
+      { kode: "400.1.2", ket: "Kurikulum dan Pembelajaran PAUD" },
+      { kode: "400.1.3", ket: "Bahan Ajar / Media Belajar PAUD" },
+      { kode: "400.1.4", ket: "Bantuan Operasional PAUD" },
+      { kode: "400.2", ket: "Pemberdayaan Perempuan & Perlindungan Anak" },
+      { kode: "400.2.1", ket: "Sekolah Ramah Anak (SRA)" },
+      { kode: "400.2.2", ket: "Kasus Anak / Pelaporan Kekerasan" },
+      { kode: "400.3", ket: "Pendidikan (Umum)" },
+      { kode: "400.3.1", ket: "Kebijakan Pendidikan" },
+      { kode: "400.3.2", ket: "Pendidikan Kesetaraan / PKBM" },
+      { kode: "400.3.3", ket: "Program Pendidikan Masyarakat" },
+      { kode: "400.3.3.1", ket: "Bantuan Pendidikan Masyarakat" },
+      { kode: "400.3.3.2", ket: "Pelatihan & Kegiatan Pendidikan Masyarakat" },
+      { kode: "400.3.3.3", ket: "Lomba dan Penghargaan Pendidikan Masyarakat" },
+      { kode: "400.3.5", ket: "Pendidikan Dasar (SD & SMP)" },
+      { kode: "400.3.5.1", ket: "Kurikulum dan Bahan Ajar SD" },
+      { kode: "400.3.5.1.1", ket: "Modul Ajar / RPP / Silabus SD" },
+      { kode: "400.3.5.1.2", ket: "Media Pembelajaran SD" },
+      { kode: "400.3.5.2", ket: "Bantuan Sekolah / BOS / DAK SD" },
+      { kode: "400.3.5.2.1", ket: "Pengajuan & Realisasi BOS" },
+      { kode: "400.3.5.2.2", ket: "Laporan Pertanggungjawaban BOS" },
+      { kode: "400.3.5.3", ket: "Pelatihan / Bimtek Guru SD" },
+      { kode: "400.3.5.4", ket: "Lomba, Festival, dan Penghargaan Siswa SD" },
+      { kode: "400.3.5.4.1", ket: "Lomba Akademik (MTK, IPA, Literasi)" },
+      { kode: "400.3.5.4.2", ket: "Lomba Non-Akademik (Seni, Olahraga)" },
+      { kode: "400.3.5.5", ket: "BOS Reguler SD" },
+      { kode: "400.3.5.6", ket: "Bantuan Siswa Miskin / PIP / BSM SD" },
+      { kode: "400.3.6", ket: "Pendidikan Khusus / Inklusif" },
+      { kode: "400.3.6.1", ket: "Kurikulum Sekolah Inklusif" },
+      { kode: "400.3.6.2", ket: "Alat Bantu Pembelajaran ABK" },
+      { kode: "400.3.6.3", ket: "Lomba / Kegiatan Siswa Berkebutuhan Khusus" },
+      { kode: "400.3.7", ket: "Pembinaan Guru dan Tendik" },
+      { kode: "400.3.7.1", ket: "Pendataan Guru" },
+      { kode: "400.3.7.2", ket: "Uji Kompetensi Guru" },
+      { kode: "400.3.7.3", ket: "Sertifikasi Guru" },
+      { kode: "400.3.7.4", ket: "Penghargaan Guru Berprestasi" },
+      { kode: "400.3.7.5", ket: "Peningkatan Kesejahteraan Guru" },
+      { kode: "400.3.11", ket: "Penilaian Akademik SD" },
+      { kode: "400.3.11.1", ket: "Penilaian Harian (PH)" },
+      { kode: "400.3.11.2", ket: "Penilaian Tengah Semester (PTS)" },
+      { kode: "400.3.11.3", ket: "Penilaian Akhir Semester (PAS)" },
+      { kode: "400.3.11.4", ket: "Asesmen Sumatif" },
+      { kode: "400.3.12", ket: "Penilaian Non Akademik" },
+      { kode: "400.3.12.1", ket: "Data Peserta Didik / Guru / Tendik" },
+      { kode: "400.3.12.2", ket: "Data Satuan Pendidikan / Proses Belajar" },
+      { kode: "400.3.13", ket: "Prasarana dan Sarana Pendidikan" },
+      { kode: "400.3.13.1", ket: "Prasarana Sekolah (Gedung, Kelas)" },
+      { kode: "400.3.13.2", ket: "Sarana Pembelajaran" },
+      { kode: "400.3.13.3", ket: "Monitoring dan Evaluasi Sarpras" },
+      { kode: "400.4", ket: "Olahraga dan Kebugaran" },
+      { kode: "400.4.2.1", ket: "Olahraga Pendidikan Dasar" },
+      { kode: "400.5", ket: "Kepemudaan dan Pramuka" },
+      { kode: "400.5.1", ket: "Kegiatan Pramuka SD" },
+      { kode: "400.5.2", ket: "Pangkalan Gugus Depan SD" },
+      { kode: "400.6", ket: "Kebudayaan dan Seni" },
+      { kode: "400.6.1", ket: "Pentas Seni / Festival Budaya" },
+      { kode: "400.6.2", ket: "Pembinaan Seni Tari / Musik / Teater" },
+      { kode: "400.7", ket: "Kesehatan Sekolah" },
+      { kode: "400.7.1", ket: "UKS / Kesehatan Peserta Didik" },
+      { kode: "400.7.2", ket: "Pemeriksaan Kesehatan Rutin" },
+      { kode: "400.7.3", ket: "Program Gizi Anak Sekolah" },
+
+      // ======================== 500 ========================
+      { kode: "500", ket: "Sarana dan Prasarana Sekolah" },
+      { kode: "500.1", ket: "Inventaris Barang / Aset Sekolah" },
+      { kode: "500.1.1", ket: "Pendataan Aset / Kodefikasi Barang" },
+      { kode: "500.1.2", ket: "Mutasi Barang / Penghapusan Aset" },
+      { kode: "500.1.3", ket: "Peminjaman Barang" },
+      { kode: "500.2", ket: "Pemeliharaan Gedung & Fasilitas" },
+      { kode: "500.2.1", ket: "Perbaikan Gedung / Kelas" },
+      { kode: "500.2.2", ket: "Pemeliharaan Air, Listrik, Toilet" },
+      { kode: "500.2.3", ket: "Renovasi dan Pembangunan" },
+      { kode: "500.3", ket: "Peralatan Pembelajaran" },
+      { kode: "500.3.1", ket: "Meja, Kursi, Whiteboard" },
+      { kode: "500.3.2", ket: "Proyektor, Laptop, Printer" },
+      { kode: "500.3.3", ket: "Alat Peraga IPA/Matematika" },
+      { kode: "500.4", ket: "Lingkungan Sekolah" },
+      { kode: "500.4.1", ket: "Taman Sekolah / Penghijauan" },
+      { kode: "500.4.2", ket: "Kebersihan Lingkungan" },
+      { kode: "500.4.3", ket: "Tempat Sampah & Pengelolaan Limbah" },
+
+      // ======================== 600 ========================
+      { kode: "600", ket: "Keamanan dan Ketertiban Umum" },
+      { kode: "600.1", ket: "Perlindungan Masyarakat" },
+      { kode: "600.1.1", ket: "Koordinasi dengan RT/RW" },
+      { kode: "600.1.2", ket: "Koordinasi dengan Kelurahan" },
+      { kode: "600.2", ket: "Kamtibmas" },
+      { kode: "600.2.1", ket: "Koordinasi Polsek / Babinsa" },
+      { kode: "600.2.2", ket: "Laporan Keamanan Wilayah Sekitar" },
+
+      // ======================== 700 ========================
+      { kode: "700", ket: "Komunikasi, Informasi, dan Dokumentasi" },
+      { kode: "700.1", ket: "Media Komunikasi Sekolah" },
+      { kode: "700.1.1", ket: "Pengelolaan Website Sekolah" },
+      { kode: "700.1.2", ket: "Publikasi Media Sosial" },
+      { kode: "700.1.3", ket: "Siaga Informasi / Papan Pengumuman" },
+      { kode: "700.2", ket: "Hubungan Media" },
+      { kode: "700.2.1", ket: "Dokumentasi Foto" },
+      { kode: "700.2.2", ket: "Dokumentasi Video" },
+      { kode: "700.2.3", ket: "Publikasi Berita Sekolah" },
+      { kode: "700.3", ket: "Layanan Informasi Publik" },
+      { kode: "700.3.1", ket: "Layanan Permohonan Informasi" },
+      { kode: "700.3.2", ket: "Pengaduan Masyarakat" },
+
+      // ======================== 800 ========================
+      { kode: "800", ket: "Kepegawaian / Guru / Tendik" },
+      { kode: "800.1", ket: "Pendataan Guru dan Tendik" },
+      { kode: "800.1.1", ket: "Data Guru ASN / PPPK" },
+      { kode: "800.1.2", ket: "Data Guru Honorer" },
+      { kode: "800.1.3", ket: "Data Operator / TU" },
+      { kode: "800.2", ket: "Absensi dan Disiplin Pegawai" },
+      { kode: "800.2.1", ket: "Presensi Harian" },
+      { kode: "800.2.2", ket: "Ketidakhadiran / Sakit / Izin" },
+      { kode: "800.2.3", ket: "Laporan Disiplin PNS/Non-PNS" },
+      { kode: "800.3", ket: "Cuti Pegawai" },
+      { kode: "800.3.1", ket: "Cuti Tahunan" },
+      { kode: "800.3.2", ket: "Cuti Sakit" },
+      { kode: "800.3.3", ket: "Cuti Melahirkan" },
+      { kode: "800.3.4", ket: "Cuti Penting / Dispensasi" },
+      { kode: "800.4", ket: "Pengembangan Guru" },
+      { kode: "800.4.1", ket: "Bimtek / Diklat / Workshop" },
+      { kode: "800.4.2", ket: "Kegiatan KKG / MGMP" },
+      { kode: "800.4.3", ket: "Sertifikat Pelatihan" },
+      { kode: "800.5", ket: "Karier dan Sertifikasi Guru" },
+      { kode: "800.5.1", ket: "Sertifikasi Pendidik" },
+      { kode: "800.5.2", ket: "Kenaikan Pangkat" },
+      { kode: "800.5.3", ket: "Penilaian Kinerja Guru (PKG)" },
+
+      // ======================== 900 ========================
+      { kode: "900", ket: "Keuangan Sekolah" },
+      { kode: "900.1", ket: "Dana BOS / DAK / Bantuan Pendidikan" },
+      { kode: "900.1.1", ket: "Rencana Kegiatan dan Anggaran Sekolah (RKAS)" },
+      { kode: "900.1.2", ket: "Realisasi dan Pembukuan BOS" },
+      { kode: "900.1.3", ket: "Laporan BOS Triwulan" },
+      { kode: "900.2", ket: "SPJ dan Pertanggungjawaban" },
+      { kode: "900.2.1", ket: "Bukti Pembelian / Nota" },
+      { kode: "900.2.2", ket: "Laporan SPJ Tahunan" },
+      { kode: "900.2.3", ket: "Kwitansi dan Arsip Pembayaran" },
+      { kode: "900.3", ket: "Komite / Donasi / Iuran" },
+      { kode: "900.3.1", ket: "Penerimaan Iuran Komite" },
+      { kode: "900.3.2", ket: "Laporan Penggunaan Dana Komite" },
+      { kode: "900.4", ket: "Pengelolaan Barang & Aset Keuangan" },
+      { kode: "900.4.1", ket: "Pengadaan Barang Bersumber Dana BOS" },
+      { kode: "900.4.2", ket: "Audit Keuangan / Pemeriksaan Inspektorat" }
+    ];
+
+    let selectedK = "";
+    const romawi = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
+
+    window.onload = () => {
+      const d = new Date();
+      $('tahunInput').value = d.getFullYear();
+      romawi.forEach((r, i) => {
+        const opt = document.createElement('option');
+        opt.value = r; opt.text = r;
+        if(i === d.getMonth()) opt.selected = true;
+        $('bulanSelect').add(opt);
+      });
+      renderKode(kodeData);
+      renderHistory();
+    };
+
+    function adjustNomor(val) {
+        let n = parseInt($('nomorInput').value) + val;
+        if(n < 1) n = 1;
+        $('nomorInput').value = n;
     }
 
-    // elements
-    const kodeListEl = $('kodeList');
-    const kodeDescEl = $('kodeDesc');
-    const searchEl = $('searchKode');
-    const clearSearchBtn = $('clearSearch');
-    const nomorInput = $('nomorInput');
-    const minusBtn = $('minusBtn');
-    const plusBtn = $('plusBtn');
-    const bulanSelect = $('bulanSelect');
-    const tahunInput = $('tahunInput');
-    const sekolahSelect = $('sekolahSelect');
-    const sekolahCustom = $('sekolahCustom');
-    const generateBtn = $('generateBtn');
-    const copyBtn = $('copyBtn');
-    const resetBtn = $('resetBtn');
-    const hasilEl = $('hasil');
-    const previewArea = $('previewArea');
-    const previewNumber = $('previewNumber');
-    const previewNumberInline = $('previewNumberInline');
-    const previewMeta = $('previewMeta');
-    const previewCreated = $('previewCreated');
-    const previewKet = $('previewKet');
-    const statusSaved = $('statusSaved');
-
-    const historyContainer = $('historyContainer');
-    const clearHistoryBtn = $('clearHistoryBtn');
-    const noHistoryMsg = $('noHistoryMsg');
-    const loadOnlineBtn = $('loadOnlineBtn');
-    const copyAllHistoryBtn = $('copyAllHistoryBtn');
-    const pembuatInput = $('pembuatInput');
-
-    // API URL (Apps Script) - GANTI jika perlu
-    const API_URL = "https://script.google.com/macros/s/AKfycbx_us6kcd6rAIk8YjIhxpysE6ru8yYc6YZwdR2XhjCRVjDBWoiQZor9-S1zWRGHkFyjNQ/exec";
-
-    // render kode list
-    let kodeElements = [];
-    function renderKodeList(list){
-      kodeListEl.innerHTML = '';
-      kodeElements = [];
-      list.forEach(item => {
+    function renderKode(data) {
+      const list = $('kodeList');
+      list.innerHTML = '';
+      data.forEach(item => {
         const div = document.createElement('div');
         div.className = 'kode-item';
-        div.tabIndex = 0;
-        div.setAttribute('data-kode', item.kode);
-        div.innerHTML = `<div><strong>${item.kode}</strong> <span style="color:#475569">— ${item.ket}</span></div>`;
-        div.addEventListener('click', ()=> selectKode(item.kode));
-        div.addEventListener('keydown', (e)=> { if(e.key==='Enter') selectKode(item.kode); });
-        kodeListEl.appendChild(div);
-        kodeElements.push({el:div, item});
+        div.innerHTML = `<strong>${item.kode}</strong> — ${item.ket}`;
+        div.onclick = () => {
+          selectedK = item.kode;
+          document.querySelectorAll('.kode-item').forEach(el => el.classList.remove('kode-selected'));
+          div.classList.add('kode-selected');
+        };
+        list.appendChild(div);
       });
     }
 
-    // state
-    let selectedKode = null;
-
-    function selectKode(kode){
-      selectedKode = kode;
-      kodeElements.forEach(k => {
-        if(k.item.kode === kode) k.el.classList.add('kode-selected');
-        else k.el.classList.remove('kode-selected');
-      });
-      const found = kodeData.find(x=>x.kode===kode);
-      kodeDescEl.textContent = found ? found.ket : 'Tidak ada keterangan.'; 
-      loadLastNumberForCurrentCombo();
-      previewArea.style.display = 'none';
+    function filterKode() {
+      const val = $('searchKode').value.toLowerCase();
+      const filtered = kodeData.filter(i => i.kode.includes(val) || i.ket.toLowerCase().includes(val));
+      renderKode(filtered);
     }
 
-    // initial render
-    renderKodeList(kodeData);
+    $('generateBtn').onclick = async () => {
+      if(!selectedK) return alert("Pilih Kode Surat terlebih dahulu!");
+      const ket = $('keteranganInput').value.trim();
+      if(!ket) return alert("Harap isi Perihal/Keterangan!");
 
-    // search
-    searchEl.addEventListener('input', ()=> {
-      const q = searchEl.value.trim().toLowerCase();
-      const filtered = kodeData.filter(k => (k.kode + ' ' + k.ket).toLowerCase().includes(q));
-      renderKodeList(filtered);
-      if(selectedKode){
-        const still = filtered.find(f=>f.kode===selectedKode);
-        if(still) selectKode(selectedKode);
-      }
-    });
-    clearSearchBtn.addEventListener('click', ()=> { searchEl.value=''; searchEl.dispatchEvent(new Event('input')); });
+      const no = String($('nomorInput').value).padStart(2, '0');
+      const sek = $('sekolahSelect').value;
+      const bln = $('bulanSelect').value;
+      const thn = $('tahunInput').value;
+      const pembuat = $('pembuatInput').value || "Anonim";
+      
+      const nomorFull = `${selectedK}/${no}/${sek}/${bln}/${thn}`;
+      const hasilSheet = `${nomorFull} — ${ket}`; 
 
-    // sekolah custom toggle
-    sekolahSelect.addEventListener('change', ()=>{ 
-      if(sekolahSelect.value === 'LAINNYA'){ sekolahCustom.style.display = 'block'; sekolahCustom.focus(); } 
-      else { sekolahCustom.style.display = 'none'; sekolahCustom.value = ''; }
-      loadLastNumberForCurrentCombo();
-    });
+      $('hasil').value = nomorFull;
+      $('previewNo').textContent = nomorFull;
+      $('previewKet').textContent = ket;
+      $('previewArea').style.display = 'block';
 
-    // plus/minus
-    plusBtn.addEventListener('click', ()=> { nomorInput.value = (Number(nomorInput.value || 0) + 1); });
-    minusBtn.addEventListener('click', ()=> { const v = Number(nomorInput.value || 1); if(v>1) nomorInput.value = v-1; });
-
-    // defaults
-    tahunInput.value = defaultYear;
-    bulanSelect.selectedIndex = defaultMonthIndex;
-
-    // Local storage helpers for last number
-    function storageKeyForCombo(kode, sekolah, tahun){ return `surat.last.${kode}::${sekolah}::${tahun}`; }
-    function saveLastNumber(kode, sekolah, tahun, nomor){
-      if(!kode || !sekolah || !tahun) return;
-      try { localStorage.setItem(storageKeyForCombo(kode,sekolah,tahun), String(nomor)); statusSaved.textContent = `Tersimpan: ${kode}/${padTwo(nomor)}/${sekolah}/${bulanSelect.value}/${tahun}`; setTimeout(()=> statusSaved.textContent='',1600); }
-      catch(e){}
-    }
-    function loadLastNumberForCurrentCombo(){
-      const kode = selectedKode;
-      const sekolah = (sekolahSelect.value === 'LAINNYA' ? (sekolahCustom.value.trim() || 'SD-TIDAK-TERTENTU') : sekolahSelect.value);
-      const tahun = String(tahunInput.value || defaultYear);
-      if(!kode) return;
-      const v = localStorage.getItem(storageKeyForCombo(kode,sekolah,tahun));
-      if(v && /^\d+$/.test(v)) nomorInput.value = Number(v);
-      else {
-        const alt = localStorage.getItem(storageKeyForCombo(kode,sekolah,defaultYear));
-        if(alt && /^\d+$/.test(alt)) nomorInput.value = Number(alt);
-      }
-    }
-    // save when nomor changes (debounced)
-    let saveTimer = null;
-    nomorInput.addEventListener('input', ()=>{ 
-      if(saveTimer) clearTimeout(saveTimer);
-      saveTimer = setTimeout(()=>{
-        if(!selectedKode) return;
-        const sekolah = (sekolahSelect.value === 'LAINNYA' ? (sekolahCustom.value.trim() || 'SD-TIDAK-TERTENTU') : sekolahSelect.value);
-        saveLastNumber(selectedKode,sekolah,String(tahunInput.value || defaultYear), Number(nomorInput.value || 1));
-      }, 500);
-    });
-    [sekolahCustom, sekolahSelect, tahunInput].forEach(el => el.addEventListener('change', loadLastNumberForCurrentCombo));
-    sekolahCustom.addEventListener('input', ()=> { if(sekolahSelect.value==='LAINNYA') loadLastNumberForCurrentCombo(); });
-
-    // =========================
-    // History (localStorage + online)
-    // =========================
-    const HISTORY_KEY = 'surat.history.v1';
-
-    function loadHistory(){
-      try{ const raw = localStorage.getItem(HISTORY_KEY); return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
-    }
-    function saveHistory(arr){ try{ localStorage.setItem(HISTORY_KEY, JSON.stringify(arr)); }catch(e){} }
-    function addHistoryEntry(text){
-      const nowIso = new Date().toISOString();
-      const id = nowIso + '::' + Math.random().toString(36).slice(2,9);
-      const entry = { id, text, created: nowIso };
-      const arr = loadHistory();
-      arr.unshift(entry);
-      if(arr.length > 200) arr.length = 200;
-      saveHistory(arr);
-      renderHistory();
-    }
-    function deleteHistoryEntry(id){ let arr = loadHistory(); arr = arr.filter(e=> e.id !== id); saveHistory(arr); renderHistory(); }
-    function clearHistory(){ if(!confirm('Hapus semua riwayat lokal? Tindakan ini tidak bisa dibatalkan.')) return; localStorage.removeItem(HISTORY_KEY); renderHistory(); }
-
-    // render history
-    function renderHistory(){
-      const arr = loadHistory();
-      historyContainer.innerHTML = '';
-      if(!arr || arr.length === 0){ noHistoryMsg.style.display = 'block'; return; } else noHistoryMsg.style.display = 'none';
-      arr.forEach(entry => {
-        const div = document.createElement('div'); div.className = 'history-item';
-        const left = document.createElement('div'); left.className = 'hist-left';
-        const right = document.createElement('div'); right.className = 'hist-right';
-
-        const dt = document.createElement('div'); dt.innerHTML = `<strong>${formatIndoDate(entry.created)}</strong>`;
-        const txt = document.createElement('div'); txt.className = 'tiny'; txt.textContent = entry.text;
-
-        left.appendChild(dt); left.appendChild(txt);
-
-        // copy btn
-        const copyB = document.createElement('button'); copyB.className = 'btn btn-ghost'; copyB.textContent = 'Copy';
-        copyB.addEventListener('click', async ()=>{ try{ await navigator.clipboard.writeText(entry.text); copyB.textContent = '✅'; setTimeout(()=> copyB.textContent='Copy',900); } catch{ alert('Gagal menyalin.'); } });
-
-        // delete btn
-        const delB = document.createElement('button'); delB.className = 'btn btn-muted'; delB.textContent = 'Hapus';
-        delB.addEventListener('click', ()=> { if(confirm('Hapus entri ini dari riwayat?')) deleteHistoryEntry(entry.id); });
-
-        // reuse btn
-        const reuseB = document.createElement('button'); reuseB.className = 'btn btn-primary'; reuseB.textContent = 'Gunakan';
-        reuseB.addEventListener('click', ()=>{
-          const parts = entry.text.split('/');
-          if(parts.length >= 5){
-            const kode = parts[0]; const nomor = parts[1]; const sekolah = parts[2]; const bulan = parts[3]; const tahun = parts[4];
-            const found = kodeData.find(k=>k.kode === kode);
-            if(found) { renderKodeList(kodeData); selectKode(kode); } else { alert('Kode pada riwayat tidak ditemukan di daftar kode. Pilih manual.'); }
-            nomorInput.value = Number(nomor) || 1;
-            const opt = Array.from(sekolahSelect.options).find(o=> o.value === sekolah);
-            if(opt) { sekolahSelect.value = sekolah; sekolahCustom.style.display='none'; sekolahCustom.value=''; } else { sekolahSelect.value = 'LAINNYA'; sekolahCustom.style.display='block'; sekolahCustom.value = sekolah; }
-            const bIndex = Array.from(bulanSelect.options).findIndex(o=> o.value === bulan);
-            if(bIndex >= 0) bulanSelect.selectedIndex = bIndex;
-            tahunInput.value = tahun || defaultYear;
-            const full = entry.text;
-            hasilEl.value = full; previewNumber.textContent = full; previewNumberInline.textContent = full; previewKet.textContent = (found ? found.ket : '-'); previewMeta.textContent = `${sekolah} — Kode ${kode} (${found ? found.ket : '—'}) — dimuat dari riwayat`; previewCreated.textContent = formatIndoDate(entry.created); previewArea.style.display = 'block';
-          } else alert('Format riwayat tidak dikenali.');
+      saveLocal(nomorFull, ket);
+      
+      $('generateBtn').disabled = true;
+      $('generateBtn').innerText = "Mengirim...";
+      
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          body: JSON.stringify({
+            sekolah: sek, kode: selectedK, nomor: no, bulan: bln, tahun: thn, hasil: hasilSheet, pembuat: pembuat
+          })
         });
+      } catch (e) { console.error(e); }
+      
+      $('generateBtn').disabled = false;
+      $('generateBtn').innerText = "GENERATE & SIMPAN ONLINE";
+      $('nomorInput').value = parseInt($('nomorInput').value) + 1;
+      $('keteranganInput').value = "";
+    };
 
-        right.appendChild(reuseB); right.appendChild(copyB); right.appendChild(delB);
+    function saveLocal(nomor, ket) {
+      const db = JSON.parse(localStorage.getItem(DB_NAME) || '[]');
+      db.unshift({
+        id: Date.now(),
+        nomor: nomor,
+        ket: ket,
+        tgl: new Date().toISOString()
+      });
+      localStorage.setItem(DB_NAME, JSON.stringify(db.slice(0, 100)));
+      renderHistory();
+    }
 
-        div.appendChild(left); div.appendChild(right); historyContainer.appendChild(div);
+    function renderHistory() {
+      const db = JSON.parse(localStorage.getItem(DB_NAME) || '[]');
+      const container = $('historyContainer');
+      container.innerHTML = db.length ? '' : '<p class="tiny">Belum ada riwayat lokal.</p>';
+      
+      db.forEach(item => {
+        const d = new Date(item.tgl);
+        const tglIndo = d.toLocaleString('id-ID', {weekday: 'long', day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'});
+        
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `
+          <div style="flex:1">
+            <div class="tiny">${tglIndo}</div>
+            <div style="font-weight:bold; font-size:15px; margin:3px 0; color:#1e293b;">${item.nomor}</div>
+            <div class="perihal-text">Perihal: ${item.ket}</div>
+          </div>
+          <button onclick="deleteRow(${item.id})" class="btn-danger">Hapus</button>
+        `;
+        container.appendChild(div);
       });
     }
 
-    // attach clear history
-    clearHistoryBtn.addEventListener('click', clearHistory);
-
-// =========================
-// Online save/load functions
-// =========================
-async function saveOnlineHistory(data) {
-  try {
-    // Gunakan no-cors agar fetch tidak ditolak oleh browser
-    const resp = await fetch(API_URL, {
-      method: 'POST',
-      mode: 'no-cors', // biar tidak gagal karena CORS
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    });
-
-    // Karena mode no-cors, kita tidak bisa membaca response JSON,
-    // jadi anggap berhasil kalau tidak error di fetch.
-    console.log('✅ Data dikirim ke Google Sheet (mode no-cors)');
-    statusSaved.textContent = '✅ Tersimpan ke Google Sheet';
-    setTimeout(() => (statusSaved.textContent = ''), 1800);
-
-  } catch (err) {
-    console.error('❌ Gagal kirim data ke Google Sheet:', err);
-    alert('Terjadi kesalahan saat mengirim data: ' + err.message);
-  }
-}
-
-
-
-    async function loadOnlineHistory(){
-      try{
-        const res = await fetch(API_URL);
-        const json = await res.json();
-        if(!Array.isArray(json)) return [];
-        const mapped = json.map(r => ({ created: r.Tanggal || r.Date || new Date().toISOString(), text: r.Hasil || r.hasil || (Object.values(r)[6]||'') }));
-        return mapped.reverse();
-      } catch(err){
-        console.error('Gagal muat riwayat online:', err);
-        return [];
-      }
-    }
-
-    loadOnlineBtn.addEventListener('click', async ()=>{
-      loadOnlineBtn.textContent = 'Memuat...';
-      const arr = await loadOnlineHistory();
-      if(!arr || arr.length === 0){ alert('Tidak ada riwayat online atau gagal memuat.'); loadOnlineBtn.textContent = '🔄 Muat Riwayat Online'; return; }
-      const top = arr.slice(0,50);
-      const local = loadHistory();
-      const existingTexts = new Set(local.map(x=>x.text));
-      top.forEach(a => { if(!existingTexts.has(a.text)){ local.unshift({ id: a.created + '::online', text: a.text, created: a.created }); existingTexts.add(a.text); } });
-      if(local.length > 200) local.length = 200;
-      saveHistory(local);
+    window.deleteRow = (id) => {
+      if(!confirm("Hapus catatan riwayat ini?")) return;
+      let db = JSON.parse(localStorage.getItem(DB_NAME) || '[]');
+      db = db.filter(i => i.id !== id);
+      localStorage.setItem(DB_NAME, JSON.stringify(db));
       renderHistory();
-      loadOnlineBtn.textContent = '🔄 Muat Riwayat Online';
-      alert('Riwayat online dimuat ke cache lokal.');
-    });
+    };
 
-    // copy all history
-    copyAllHistoryBtn.addEventListener('click', async ()=>{
-      const arr = loadHistory();
-      if(!arr.length) return alert('Belum ada riwayat.');
-      const text = arr.map(e => e.text).join('\n');
-      try{ await navigator.clipboard.writeText(text); copyAllHistoryBtn.textContent = '✅ Disalin Semua'; setTimeout(()=> copyAllHistoryBtn.textContent='📋 Salin Semua',1200); }catch{ alert('Gagal menyalin semua riwayat.'); }
-    });
+    window.clearAllHistory = () => {
+      if(!confirm("Hapus semua riwayat di perangkat ini?")) return;
+      localStorage.removeItem(DB_NAME);
+      renderHistory();
+    };
 
-    // =========================
-    // Generate & Preview logic
-    // =========================
-    function getSelectedSchool(){ return (sekolahSelect.value === 'LAINNYA' ? (sekolahCustom.value.trim() || 'SD-TIDAK-TERTENTU') : sekolahSelect.value); }
-    function getSelectedMonth(){ return bulanSelect.value; }
-    function validateFields(){ if(!selectedKode) { alert('Pilih kode surat terlebih dahulu.'); return false; } const nomor = Number(nomorInput.value || 0); if(!Number.isFinite(nomor) || nomor < 1) { alert('Nomor surat tidak valid.'); return false; } const tahun = Number(tahunInput.value || 0); if(!Number.isFinite(tahun) || tahun < 1900) { alert('Tahun tidak valid.'); return false; } return true; }
-    function buildNomorSurat(){ const kode = selectedKode; const nomor = padTwo(Number(nomorInput.value || 1)); const sekolah = getSelectedSchool(); const bulan = getSelectedMonth(); const tahun = String(tahunInput.value || defaultYear); return `${kode}/${nomor}/${sekolah}/${bulan}/${tahun}`; }
-    function updatePreviewAndSave(){
-      if(!validateFields()) return;
-      const full = buildNomorSurat();
-      hasilEl.value = full; previewNumber.textContent = full; previewNumberInline.textContent = full; const found = kodeData.find(k=>k.kode===selectedKode); previewKet.textContent = found ? found.ket : '-'; previewMeta.textContent = `${getSelectedSchool()} — Kode ${selectedKode} (${found ? found.ket : '—'}) — dibuat:`; previewCreated.textContent = formatIndoDate(new Date().toISOString()); previewArea.style.display = 'block';
-      // save last nomor for combo
-      saveLastNumber(selectedKode, getSelectedSchool(), String(tahunInput.value || defaultYear), Number(nomorInput.value || 1));
-      // add to local history
-      addHistoryEntry(full);
-      // send to online sheet
-      saveOnlineHistory({ sekolah: getSelectedSchool(), kode: selectedKode, nomor: padTwo(Number(nomorInput.value||1)), bulan: getSelectedMonth(), tahun: tahunInput.value, hasil: full, pembuat: (pembuatInput.value || 'Anon') });
-      // increment nomor for convenience
-      nomorInput.value = Number(nomorInput.value) + 1;
-      saveLastNumber(selectedKode, getSelectedSchool(), String(tahunInput.value || defaultYear), Number(nomorInput.value || 1));
+    async function loadOnline() {
+      $('btnOnline').innerText = "Memuat...";
+      try {
+        const resp = await fetch(API_URL + "?t=" + Date.now());
+        const data = await resp.json();
+        if(Array.isArray(data)) {
+          let db = JSON.parse(localStorage.getItem(DB_NAME) || '[]');
+          data.reverse().forEach(row => {
+            const val = row.hasil || row.Hasil;
+            if(val) {
+              const parts = val.split(' — ');
+              const noOnly = parts[0];
+              if(!db.find(i => i.nomor === noOnly)) {
+                db.unshift({
+                  id: Date.now() + Math.random(),
+                  nomor: noOnly,
+                  ket: parts[1] || "Data Online",
+                  tgl: row.Tanggal || new Date().toISOString()
+                });
+              }
+            }
+          });
+          localStorage.setItem(DB_NAME, JSON.stringify(db.slice(0, 150)));
+          renderHistory();
+          alert("Sinkronisasi Berhasil!");
+        }
+      } catch (e) { alert("Gagal mengambil data online."); }
+      $('btnOnline').innerText = "🔄 Sinkron Online";
     }
 
-    // generate button
-    generateBtn.addEventListener('click', updatePreviewAndSave);
-
-    // copy button
-    copyBtn.addEventListener('click', async ()=>{
-      if(!hasilEl.value.trim()){ alert('Belum ada hasil. Tekan Generate dulu.'); return; }
-      try{ await navigator.clipboard.writeText(hasilEl.value.trim()); copyBtn.textContent = '✅ Disalin'; setTimeout(()=> copyBtn.textContent='Copy',1200); }
-      catch{ hasilEl.select(); try { document.execCommand('copy'); copyBtn.textContent = '✅ Disalin'; setTimeout(()=> copyBtn.textContent='Copy',1200); } catch { alert('Gagal menyalin ke clipboard.'); } }
-    });
-
-    // reset button (doesn't clear history)
-    resetBtn.addEventListener('click', ()=>{
-      selectedKode = null; kodeElements.forEach(k=>k.el.classList.remove('kode-selected'));
-      kodeDescEl.textContent = 'Pilih kode untuk melihat keterangan.';
-      nomorInput.value = 1; sekolahSelect.selectedIndex = 0; sekolahCustom.value=''; sekolahCustom.style.display='none';
-      bulanSelect.selectedIndex = defaultMonthIndex; tahunInput.value = defaultYear; hasilEl.value = ''; previewArea.style.display = 'none';
-    });
-
-    // initial load
-    window.addEventListener('load', ()=>{ if(kodeData.length) selectKode(kodeData[0].kode); renderHistory(); searchEl.focus(); });
-
+    $('copyBtn').onclick = () => {
+      const h = $('hasil').value;
+      if(!h) return;
+      navigator.clipboard.writeText(h);
+      const originalText = $('copyBtn').innerText;
+      $('copyBtn').innerText = "✅ Berhasil!";
+      setTimeout(() => $('copyBtn').innerText = originalText, 1500);
+    };
   </script>
 </body>
 </html>
-
-
-
-
