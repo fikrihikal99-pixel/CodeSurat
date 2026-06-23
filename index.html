@@ -459,17 +459,44 @@
       renderKode(filtered);
     }
 
-    // Convert file to Base64
+   
+    // Convert file to Base64 & OTOMATIS KOMPRES GAMBAR
     function previewImage(event) {
       const file = event.target.files[0];
       if (file) {
         namaGambar = file.name;
         const reader = new FileReader();
         reader.onload = function(e) {
-          $('imgPreview').src = e.target.result;
-          $('imgPreview').style.display = 'block';
-          base64Gambar = e.target.result.split(',')[1];
-        }
+          const img = new Image();
+          img.onload = function() {
+            // Siapkan Canvas untuk mengompres gambar
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800; // Maksimal lebar foto 800 pixel (Sangat cukup untuk dokumen)
+            let width = img.width;
+            let height = img.height;
+
+            // Hitung rasio ukuran baru
+            if (width > MAX_WIDTH) {
+              height = Math.round((height *= MAX_WIDTH / width));
+              width = MAX_WIDTH;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Ubah gambar menjadi format JPEG dengan kualitas 60% (Sangat ringan tapi tetap jelas)
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+            
+            $('imgPreview').src = compressedDataUrl;
+            $('imgPreview').style.display = 'block';
+            
+            // Ambil kode Base64 dari gambar yang sudah dikompres
+            base64Gambar = compressedDataUrl.split(',')[1];
+          };
+          img.src = e.target.result;
+        };
         reader.readAsDataURL(file);
       }
     }
