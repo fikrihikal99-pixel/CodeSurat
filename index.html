@@ -504,20 +504,23 @@
       $('generateBtn').innerText = base64Gambar ? "Mengupload & Menyimpan..." : "Menyimpan Data...";
       
       try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          body: JSON.stringify({
-            sekolah: sek, 
-            kode: selectedK, 
-            nomor: no, 
-            bulan: bln, 
-            tahun: thn, 
-            hasil: hasilSheet, 
-            pembuat: pembuat,
-            gambarData: base64Gambar,
-            gambarNama: namaGambar
-          })
-        });
+        const response = await fetch(API_URL,{
+  method:'POST',
+  headers:{
+    "Content-Type":"application/json"
+  },
+  body:JSON.stringify({
+    sekolah: sek,
+    kode: selectedK,
+    nomor: no,
+    bulan: bln,
+    tahun: thn,
+    hasil: hasilSheet,
+    pembuat: pembuat,
+    gambarData: base64Gambar,
+    gambarNama: namaGambar
+  })
+});
 
         const result = await response.json();
         
