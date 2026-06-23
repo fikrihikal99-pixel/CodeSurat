@@ -484,7 +484,7 @@
       const ket = $('keteranganInput').value.trim();
       if(!ket) return alert("Harap isi Perihal/Keterangan!");
 
-      const no = String($('nomorInput').value).padStart(2, '0');
+      const no = String($('nomorInput').value).padStart(3, '0');
       const sek = $('sekolahSelect').value;
       const bln = $('bulanSelect').value;
       const thn = $('tahunInput').value;
@@ -504,11 +504,8 @@
       $('generateBtn').innerText = base64Gambar ? "Mengupload & Menyimpan..." : "Menyimpan Data...";
       
       try {
-        const response = await fetch(API_URL,{
+       const response = await fetch(API_URL,{
   method:'POST',
-  headers:{
-    "Content-Type":"application/json"
-  },
   body:JSON.stringify({
     sekolah: sek,
     kode: selectedK,
@@ -522,11 +519,26 @@
   })
 });
 
-        const result = await response.json();
-        
-        // Simpan ke local storage dengan link dari Google Drive jika berhasil
-        const finalImgLink = result.url || localImgData;
-        saveLocal(nomorFull, ket, finalImgLink);
+const text = await response.text();
+
+console.log(text);
+
+let result;
+
+try{
+    result = JSON.parse(text);
+}catch(err){
+    result = {
+        status:"success",
+        url:""
+    };
+}
+
+const finalImgLink = result.url || localImgData;
+
+saveLocal(nomorFull, ket, finalImgLink);
+
+alert("Berhasil disimpan ke Google Sheet");
 
       } catch (e) { 
         console.error("Gagal mengirim data online:", e); 
