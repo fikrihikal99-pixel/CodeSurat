@@ -17,6 +17,7 @@
     input, select, textarea{ width:100%; padding:8px 10px; border-radius:8px; border:1px solid #e6e9ef; font-size:14px; box-sizing:border-box; background:white; }
     .btn{ border:0; padding:10px 15px; border-radius:8px; cursor:pointer; font-weight:700; transition:0.2s; }
     .btn-primary{ background:var(--accent); color:white; }
+    .btn-primary:disabled{ background:var(--muted); cursor:not-allowed; }
     .btn-ghost{ background:#eef2ff; color:var(--accent); }
     .btn-danger{ background:#fee2e2; color:var(--danger); font-size: 11px; padding: 5px 10px; }
     .nbtn{ width:38px; height:38px; border-radius:8px; border:0; background:var(--accent); color:white; font-size:18px; cursor:pointer; }
@@ -108,16 +109,15 @@
   <script>
     const $ = id => document.getElementById(id);
     
-    // GANTI URL INI DENGAN LINK WEB APP APPS SCRIPT ANDA YANG BARU
+    // API URL TERBARU & FINAL
     const API_URL = "https://script.google.com/macros/s/AKfycbyV3PUHX0g316aaNsoT7KeWVL60I8EbNaKqfaIT9bpEeUXEGaFGZxxviajna3USsW1ULQ/exec"; 
     
     const DB_NAME = 'surat_db_ciluar1';
     let base64Gambar = "";
     let namaGambar = "";
 
-    // POTONGAN KODE DATA (Anda bisa melengkapinya sesuai versi panjang Anda sebelumnya)
+    // DATABASE KODE SURAT
     const kodeData = [
-      // ======================== 000 ========================
       { kode: "000", ket: "Urusan Umum" },
       { kode: "000.1", ket: "Ketatausahaan" },
       { kode: "000.1.1", ket: "Persuratan / Tata Naskah Dinas" },
@@ -152,8 +152,6 @@
       { kode: "000.8.1", ket: "Struktur Organisasi Sekolah" },
       { kode: "000.8.2", ket: "Tugas Pokok dan Fungsi" },
       { kode: "000.9", ket: "Penelitian dan Pengembangan" },
-
-      // ======================== 100 ========================
       { kode: "100", ket: "Pemerintahan dan Administrasi Resmi Sekolah" },
       { kode: "100.1", ket: "Kepala Sekolah" },
       { kode: "100.1.1", ket: "Kebijakan dan Arahan Kepala Sekolah" },
@@ -190,8 +188,6 @@
       { kode: "100.7.1", ket: "Program Kerja Komite" },
       { kode: "100.7.2", ket: "Laporan Pertanggungjawaban Komite" },
       { kode: "100.7.3", ket: "Rapat dan Notulen Komite" },
-
-      // ======================== 200 ========================
       { kode: "200", ket: "Kegiatan Organisasi, Hubungan Masyarakat, dan Komunikasi Sekolah" },
       { kode: "200.1", ket: "Organisasi Sekolah" },
       { kode: "200.1.1", ket: "Struktur Organisasi Sekolah" },
@@ -228,8 +224,6 @@
       { kode: "200.7.1", ket: "Foto Kegiatan Sekolah" },
       { kode: "200.7.2", ket: "Video Kegiatan Sekolah" },
       { kode: "200.7.3", ket: "Publikasi di Media" },
-
-      // ======================== 300 ========================
       { kode: "300", ket: "Keamanan, Ketertiban, dan Penanggulangan Bencana Sekolah" },
       { kode: "300.1", ket: "Ketertiban Sekolah" },
       { kode: "300.1.1", ket: "Tata Tertib Sekolah (Disiplin Guru & Siswa)" },
@@ -270,8 +264,6 @@
       { kode: "300.8.1", ket: "Pencurian di Sekolah" },
       { kode: "300.8.2", ket: "Perusakan Fasilitas Sekolah" },
       { kode: "300.8.3", ket: "Koordinasi dengan Polsek / Babinsa" },
-
-      // ======================== 400 ========================
       { kode: "400", ket: "Bidang Pendidikan" },
       { kode: "400.1", ket: "Pendidikan Anak Usia Dini (PAUD)" },
       { kode: "400.1.1", ket: "Pengelolaan PAUD" },
@@ -335,8 +327,6 @@
       { kode: "400.7.1", ket: "UKS / Kesehatan Peserta Didik" },
       { kode: "400.7.2", ket: "Pemeriksaan Kesehatan Rutin" },
       { kode: "400.7.3", ket: "Program Gizi Anak Sekolah" },
-
-      // ======================== 500 ========================
       { kode: "500", ket: "Sarana dan Prasarana Sekolah" },
       { kode: "500.1", ket: "Inventaris Barang / Aset Sekolah" },
       { kode: "500.1.1", ket: "Pendataan Aset / Kodefikasi Barang" },
@@ -354,8 +344,6 @@
       { kode: "500.4.1", ket: "Taman Sekolah / Penghijauan" },
       { kode: "500.4.2", ket: "Kebersihan Lingkungan" },
       { kode: "500.4.3", ket: "Tempat Sampah & Pengelolaan Limbah" },
-
-      // ======================== 600 ========================
       { kode: "600", ket: "Keamanan dan Ketertiban Umum" },
       { kode: "600.1", ket: "Perlindungan Masyarakat" },
       { kode: "600.1.1", ket: "Koordinasi dengan RT/RW" },
@@ -363,8 +351,6 @@
       { kode: "600.2", ket: "Kamtibmas" },
       { kode: "600.2.1", ket: "Koordinasi Polsek / Babinsa" },
       { kode: "600.2.2", ket: "Laporan Keamanan Wilayah Sekitar" },
-
-      // ======================== 700 ========================
       { kode: "700", ket: "Komunikasi, Informasi, dan Dokumentasi" },
       { kode: "700.1", ket: "Media Komunikasi Sekolah" },
       { kode: "700.1.1", ket: "Pengelolaan Website Sekolah" },
@@ -377,8 +363,6 @@
       { kode: "700.3", ket: "Layanan Informasi Publik" },
       { kode: "700.3.1", ket: "Layanan Permohonan Informasi" },
       { kode: "700.3.2", ket: "Pengaduan Masyarakat" },
-
-      // ======================== 800 ========================
       { kode: "800", ket: "Kepegawaian / Guru / Tendik" },
       { kode: "800.1", ket: "Pendataan Guru dan Tendik" },
       { kode: "800.1.1", ket: "Data Guru ASN / PPPK" },
@@ -401,8 +385,6 @@
       { kode: "800.5.1", ket: "Sertifikasi Pendidik" },
       { kode: "800.5.2", ket: "Kenaikan Pangkat" },
       { kode: "800.5.3", ket: "Penilaian Kinerja Guru (PKG)" },
-
-      // ======================== 900 ========================
       { kode: "900", ket: "Keuangan Sekolah" },
       { kode: "900.1", ket: "Dana BOS / DAK / Bantuan Pendidikan" },
       { kode: "900.1.1", ket: "Rencana Kegiatan dan Anggaran Sekolah (RKAS)" },
@@ -423,7 +405,8 @@
     let selectedK = "";
     const romawi = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
 
-    window.onload = () => {
+    // SINKRONISASI OTOMATIS SAAT WEB DIBUKA
+    window.onload = async () => {
       const d = new Date();
       $('tahunInput').value = d.getFullYear();
       romawi.forEach((r, i) => {
@@ -434,6 +417,18 @@
       });
       renderKode(kodeData);
       renderHistory();
+
+      // Fitur Cek Nomor Terakhir dari Server
+      $('nomorInput').disabled = true;
+      try {
+        const res = await fetch(API_URL + "?mode=nomor");
+        const out = await res.json();
+        // Set nomor (nomor terakhir di server + 1)
+        $('nomorInput').value = (parseInt(out.nomor) || 0) + 1;
+      } catch(e) {
+        console.error("Gagal sinkron nomor otomatis:", e);
+      }
+      $('nomorInput').disabled = false;
     };
 
     function adjustNomor(val) {
@@ -464,7 +459,7 @@
       renderKode(filtered);
     }
 
-    // Convert file to Base64 untuk dikirim ke Google Script
+    // Convert file to Base64
     function previewImage(event) {
       const file = event.target.files[0];
       if (file) {
@@ -479,6 +474,7 @@
       }
     }
 
+    // FUNGSI GENERATE DAN KIRIM
     $('generateBtn').onclick = async () => {
       if(!selectedK) return alert("Pilih Kode Surat terlebih dahulu!");
       const ket = $('keteranganInput').value.trim();
@@ -501,55 +497,47 @@
       const localImgData = base64Gambar ? `data:image/jpeg;base64,${base64Gambar}` : "";
       
       $('generateBtn').disabled = true;
-      $('generateBtn').innerText = base64Gambar ? "Mengupload & Menyimpan..." : "Menyimpan Data...";
+      $('generateBtn').innerText = base64Gambar ? "MENGUPLOAD GAMBAR & DATA..." : "MENYIMPAN DATA ONLINE...";
       
       try {
-       const response = await fetch(API_URL,{
-  method:'POST',
-  body:JSON.stringify({
-    sekolah: sek,
-    kode: selectedK,
-    nomor: no,
-    bulan: bln,
-    tahun: thn,
-    hasil: hasilSheet,
-    pembuat: pembuat,
-    gambarData: base64Gambar,
-    gambarNama: namaGambar
-  })
-});
+        const response = await fetch(API_URL, {
+          method:'POST',
+          body:JSON.stringify({
+            sekolah: sek,
+            kode: selectedK,
+            nomor: no,
+            bulan: bln,
+            tahun: thn,
+            hasil: hasilSheet,
+            pembuat: pembuat,
+            gambarData: base64Gambar,
+            gambarNama: namaGambar
+          })
+        });
 
-const text = await response.text();
+        const text = await response.text();
+        let result;
 
-console.log(text);
+        try {
+            result = JSON.parse(text);
+        } catch(err) {
+            result = { status:"success", url:"" };
+        }
 
-let result;
-
-try{
-    result = JSON.parse(text);
-}catch(err){
-    result = {
-        status:"success",
-        url:""
-    };
-}
-
-const finalImgLink = result.url || localImgData;
-
-saveLocal(nomorFull, ket, finalImgLink);
-
-alert("Berhasil disimpan ke Google Sheet");
+        const finalImgLink = result.url || localImgData;
+        saveLocal(nomorFull, ket, finalImgLink);
+        
+        alert("Sip! Data surat berhasil disimpan ke Server / Google Sheet.");
 
       } catch (e) { 
         console.error("Gagal mengirim data online:", e); 
-        // Tetap simpan lokal jika offline/gagal
         saveLocal(nomorFull, ket, localImgData);
-        alert("Gagal terhubung ke Google Sheet, data disimpan secara lokal.");
+        alert("Terjadi kendala jaringan. Data disimpan sementara secara lokal.");
       }
       
       $('generateBtn').disabled = false;
       $('generateBtn').innerText = "GENERATE & SIMPAN ONLINE";
-      $('nomorInput').value = parseInt($('nomorInput').value) + 1;
+      $('nomorInput').value = parseInt($('nomorInput').value) + 1; // Otomatis naik +1 setelah sukses
       $('keteranganInput').value = "";
       $('gambarInput').value = "";
       $('imgPreview').style.display = 'none';
@@ -557,6 +545,7 @@ alert("Berhasil disimpan ke Google Sheet");
       namaGambar = "";
     };
 
+    // SIMPAN RIWAYAT LOKAL
     function saveLocal(nomor, ket, imgData) {
       const db = JSON.parse(localStorage.getItem(DB_NAME) || '[]');
       db.unshift({
@@ -570,6 +559,7 @@ alert("Berhasil disimpan ke Google Sheet");
       renderHistory();
     }
 
+    // TAMPILKAN RIWAYAT
     function renderHistory() {
       const db = JSON.parse(localStorage.getItem(DB_NAME) || '[]');
       const container = $('historyContainer');
@@ -617,6 +607,7 @@ alert("Berhasil disimpan ke Google Sheet");
       renderHistory();
     };
 
+    // SINKRON TARIK DATA LAMA DARI SHEET KE HTML
     async function loadOnline() {
       $('btnOnline').innerText = "Memuat...";
       try {
@@ -645,7 +636,7 @@ alert("Berhasil disimpan ke Google Sheet");
           renderHistory();
           alert("Sinkronisasi Berhasil!");
         }
-      } catch (e) { alert("Gagal mengambil data online."); }
+      } catch (e) { alert("Gagal mengambil data online. Pastikan koneksi internet stabil."); }
       $('btnOnline').innerText = "🔄 Sinkron Online";
     }
 
@@ -654,7 +645,7 @@ alert("Berhasil disimpan ke Google Sheet");
       if(!h) return;
       navigator.clipboard.writeText(h);
       const originalText = $('copyBtn').innerText;
-      $('copyBtn').innerText = "✅ Berhasil!";
+      $('copyBtn').innerText = "✅ Berhasil Disalin!";
       setTimeout(() => $('copyBtn').innerText = originalText, 1500);
     };
   </script>
